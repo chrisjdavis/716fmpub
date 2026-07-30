@@ -5,16 +5,16 @@ import { usePathname } from "next/navigation";
 import { memo, useEffect, useRef, useState } from "react";
 import { LogoutForm } from "@/components/logout-form";
 
-const PRIMARY_NAV: readonly { href: string; label: string }[] = [
-  { href: "/dashboard", label: "Home" },
-  { href: "/dashboard/explore", label: "Explore" },
-  { href: "/dashboard/archive", label: "Archive" },
+const PRIMARY_NAV: readonly { href: string; label: string; title: string }[] = [
+  { href: "/dashboard", label: "Home", title: "Today’s listening briefing" },
+  { href: "/dashboard/explore", label: "Explore", title: "Months — Musical Time Machine" },
+  { href: "/dashboard/archive", label: "Archive", title: "Every play in the tape" },
 ];
 
-const MORE_NAV: readonly { href: string; label: string }[] = [
-  { href: "/dashboard/imports", label: "Import" },
-  { href: "/dashboard/export", label: "Export" },
-  { href: "/dashboard/settings", label: "Settings" },
+const MORE_NAV: readonly { href: string; label: string; title: string }[] = [
+  { href: "/dashboard/imports", label: "Import", title: "Import and sync jobs" },
+  { href: "/dashboard/export", label: "Export", title: "Export listen archives" },
+  { href: "/dashboard/settings", label: "Settings", title: "Account and public listening" },
 ];
 
 /** Shared motion for top-rail links (respects `prefers-reduced-motion`). */
@@ -109,11 +109,12 @@ function AppPrimaryNavInner({ locked = false }: Readonly<{ locked?: boolean }>) 
       className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-4 gap-y-2 sm:gap-x-6 md:gap-x-8"
       aria-label="Primary navigation"
     >
-      {PRIMARY_NAV.map(({ href, label }) => (
+      {PRIMARY_NAV.map(({ href, label, title }) => (
         <Link
           key={href}
           href={href}
           prefetch
+          title={title}
           className={linkClass(isPrimaryActive(pathname, href))}
         >
           {label}
@@ -150,11 +151,12 @@ function AppPrimaryNavInner({ locked = false }: Readonly<{ locked?: boolean }>) 
             aria-labelledby="dashboard-more-trigger"
             className="absolute right-0 top-full z-50 mt-2 min-w-[12rem] rounded-md border border-hairline bg-surface py-1 shadow-lg motion-safe:animate-nav-menu-in motion-reduce:animate-none"
           >
-            {MORE_NAV.map(({ href, label }) => (
+            {MORE_NAV.map(({ href, label, title }) => (
               <li key={href}>
                 <Link
                   href={href}
                   prefetch
+                  title={title}
                   onClick={() => setMoreOpen(false)}
                   className={`${moreMenuLinkClass} ${
                     moreItemActive(pathname, href)

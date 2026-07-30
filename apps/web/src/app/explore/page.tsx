@@ -101,6 +101,7 @@ export default async function PublicExplorePage({
                     explorePath={PUBLIC_EXPLORE_PATH}
                     archivePath={PUBLIC_ARCHIVE_PATH}
                     skipStatsFoundationJobs
+                    viewer="public"
                   />
                 </Suspense>
               ) : (

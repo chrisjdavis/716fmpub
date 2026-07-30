@@ -7,11 +7,13 @@ import styles from "./dashboard-time-machine-explore.module.css";
 
 export function DashboardTimeMachineAnchorCover({
   imageUrl,
-  alt,
+  alt: _accessibleNameOnParent,
 }: Readonly<{
   imageUrl: string | null | undefined;
+  /** Prefer putting the accessible name on the wrapping control; img uses empty alt. */
   alt: string;
 }>) {
+  void _accessibleNameOnParent;
   const safeUrl = useMemo(() => sanitizeRemoteCoverImageUrl(imageUrl), [imageUrl]);
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -56,7 +58,7 @@ export function DashboardTimeMachineAnchorCover({
         <img
           ref={imgRef}
           src={safeUrl}
-          alt={alt}
+          alt=""
           onLoad={() => setLoaded(true)}
           onError={() => setFailed(true)}
           className={`${styles.anchorCoverImgLayer} ${loaded ? styles.anchorCoverImgLayerVisible : ""}`}

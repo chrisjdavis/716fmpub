@@ -27,6 +27,7 @@ export async function DashboardCompletedPanelsRsc({
   explorePath = "/dashboard/explore",
   archivePath = "/dashboard/archive",
   skipStatsFoundationJobs = false,
+  viewer = "owner",
 }: Readonly<{
   userId: string;
   searchParams: Promise<{ month?: string | string[]; range?: string | string[]; view?: string | string[] }>;
@@ -36,6 +37,7 @@ export async function DashboardCompletedPanelsRsc({
   archivePath?: string;
   /** When true, do not enqueue stats foundation jobs (public guest reads). */
   skipStatsFoundationJobs?: boolean;
+  viewer?: "owner" | "public";
 }>) {
   const env = loadServerEnv();
   const pool = getPool(env);
@@ -91,6 +93,7 @@ export async function DashboardCompletedPanelsRsc({
       statsFoundationPending={statsFoundationPending}
       explorePath={explorePath}
       archivePath={archivePath}
+      viewer={viewer}
     />
   );
 }

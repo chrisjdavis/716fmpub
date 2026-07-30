@@ -13,6 +13,8 @@ html {
   --auth-form-max-width: calc(var(--app-content-max-width) * 0.67);
   /* Deep orange accent (home meta rail, stats range UI); space-separated for Tailwind alpha */
   --brand-rgb: 255 87 34;
+  /* Explore “New Music” timeline accent (blue, distinct from brand orange) */
+  --accent-new-music-rgb: 37 99 235;
   --black: #f5f5f5;
   --surface: #ffffff;
   --surface-raised: #f0f0f0;
@@ -32,6 +34,7 @@ html {
 
 html.dark {
   --brand-rgb: 255 87 34;
+  --accent-new-music-rgb: 37 99 235;
   /* Warm-tinted neutrals (dashboard / ledger canvas; subtle chroma toward brand hue). */
   --black: oklch(0.09 0.006 55);
   --surface: oklch(0.105 0.007 55);
@@ -138,9 +141,9 @@ input.vs-control {
 
 /* Explore — “New Music” timeline (blue accent instead of brand orange). */
 .time-machine-rail--new-music::-webkit-slider-thumb {
-  background: rgb(37 99 235);
+  background: rgb(var(--accent-new-music-rgb));
 }
 
 .time-machine-rail--new-music::-moz-range-thumb {
-  background: rgb(37 99 235);
+  background: rgb(var(--accent-new-music-rgb));
 }

@@ -18,7 +18,7 @@ export function DashboardStatsShellFallback() {
       <section aria-labelledby="explore-fallback-title" className="w-full space-y-5">
         <p className="font-mono text-label uppercase tracking-[0.24em] text-overline">Explore</p>
         <h1 id="explore-fallback-title" className="sr-only">
-          Your musical time machine
+          Musical time machine
         </h1>
         <div className="w-full max-w-none space-y-3" aria-hidden>
           <div className={`h-9 w-[min(100%,20rem)] md:h-12 md:w-[min(100%,36rem)] ${pulseBar}`} />

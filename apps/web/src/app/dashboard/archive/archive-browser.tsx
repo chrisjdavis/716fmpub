@@ -819,37 +819,45 @@ export function ArchiveBrowser({
                 <option value="90d">Last 90 days</option>
               </select>
             </div>
-            <div className={styles.field}>
-              <span className={styles.fieldLabel} id="archive-filter-source">
-                Source
-              </span>
-              <select
-                className={`${styles.select} ${styles.selectSource}`}
-                aria-labelledby="archive-filter-source"
-                value={source}
-                onChange={(e) => setSource(e.target.value as ArchiveListenSourceFilter)}
-              >
-                <option value="all">All sources</option>
-                <option value="lastfm">Last.fm</option>
-                <option value="import">Import</option>
-                <option value="spotify">Spotify</option>
-              </select>
-            </div>
-            <div className={styles.field}>
-              <span className={styles.fieldLabel} id="archive-filter-type">
-                Type
-              </span>
-              <select
-                className={`${styles.select} ${styles.selectType}`}
-                aria-labelledby="archive-filter-type"
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value as ArchiveListenTypeFilter)}
-              >
-                <option value="tracks">Tracks</option>
-                <option value="artists">Artists</option>
-                <option value="albums">Albums</option>
-              </select>
-            </div>
+            <details
+              className={styles.moreFilters}
+              open={source !== "all" || typeFilter !== "tracks"}
+            >
+              <summary className={styles.moreFiltersSummary}>More filters</summary>
+              <div className={styles.moreFiltersBody}>
+                <div className={styles.field}>
+                  <span className={styles.fieldLabel} id="archive-filter-source">
+                    Source
+                  </span>
+                  <select
+                    className={`${styles.select} ${styles.selectSource}`}
+                    aria-labelledby="archive-filter-source"
+                    value={source}
+                    onChange={(e) => setSource(e.target.value as ArchiveListenSourceFilter)}
+                  >
+                    <option value="all">All sources</option>
+                    <option value="lastfm">Last.fm</option>
+                    <option value="import">Import</option>
+                    <option value="spotify">Spotify</option>
+                  </select>
+                </div>
+                <div className={styles.field}>
+                  <span className={styles.fieldLabel} id="archive-filter-type">
+                    Type
+                  </span>
+                  <select
+                    className={`${styles.select} ${styles.selectType}`}
+                    aria-labelledby="archive-filter-type"
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value as ArchiveListenTypeFilter)}
+                  >
+                    <option value="tracks">Tracks</option>
+                    <option value="artists">Artists</option>
+                    <option value="albums">Albums</option>
+                  </select>
+                </div>
+              </div>
+            </details>
           </div>
         </div>
         </div>

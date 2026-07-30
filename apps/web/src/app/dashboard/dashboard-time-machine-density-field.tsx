@@ -214,32 +214,63 @@ export function DashboardTimeMachineDensityField({
       return;
     }
 
+    const root = wrapRef.current;
     let raf = 0;
-    const loop = () => {
-      phaseRef.current += 0.035;
-      drawFrame();
+    let lastPaint = 0;
+    let visible = document.visibilityState === "visible";
+    let inView = true;
+
+    const stop = () => {
+      if (raf !== 0) {
+        window.cancelAnimationFrame(raf);
+        raf = 0;
+      }
+    };
+
+    const loop = (now: number) => {
+      // ~12fps shimmer — enough motion without a continuous 60fps paint tax.
+      if (now - lastPaint >= 80) {
+        lastPaint = now;
+        phaseRef.current += 0.08;
+        drawFrame();
+      }
       raf = window.requestAnimationFrame(loop);
+    };
+
+    const sync = () => {
+      if (visible && inView) {
+        if (raf === 0) {
+          raf = window.requestAnimationFrame(loop);
+        }
+      } else {
+        stop();
+        drawFrame();
+      }
     };
 
     const onVisibility = () => {
-      if (document.visibilityState === "hidden") {
-        window.cancelAnimationFrame(raf);
-        raf = 0;
-      } else if (raf === 0) {
-        raf = window.requestAnimationFrame(loop);
-      }
+      visible = document.visibilityState === "visible";
+      sync();
     };
 
     document.addEventListener("visibilitychange", onVisibility);
-    if (document.visibilityState === "visible") {
-      raf = window.requestAnimationFrame(loop);
+    let io: IntersectionObserver | null = null;
+    if (root && typeof IntersectionObserver !== "undefined") {
+      io = new IntersectionObserver(
+        (entries) => {
+          inView = entries.some((e) => e.isIntersecting);
+          sync();
+        },
+        { root: null, threshold: 0.05 },
+      );
+      io.observe(root);
     }
+    sync();
 
     return () => {
       document.removeEventListener("visibilitychange", onVisibility);
-      if (raf !== 0) {
-        window.cancelAnimationFrame(raf);
-      }
+      io?.disconnect();
+      stop();
     };
   }, [drawFrame]);
 
@@ -260,7 +291,7 @@ export function DashboardTimeMachineDensityField({
         ref={probeBrandRef}
         className={
           accentVariant === "newMusic"
-            ? "pointer-events-none absolute left-0 top-0 opacity-0 text-[rgb(37_99_235)]"
+            ? "pointer-events-none absolute left-0 top-0 opacity-0 text-[rgb(var(--accent-new-music-rgb))]"
             : "pointer-events-none absolute left-0 top-0 opacity-0 text-brand"
         }
         aria-hidden

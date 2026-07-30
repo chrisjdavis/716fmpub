@@ -360,13 +360,24 @@ export function SettingsAccountProfileForm() {
           onChange={(ev) => setDisplayName(ev.target.value)}
           maxLength={120}
           className="vs-control"
+          aria-invalid={fieldErrors?.displayName ? true : undefined}
+          aria-describedby={
+            fieldErrors?.displayName ? "settings-display-name-error" : "settings-display-name-hint"
+          }
         />
         {fieldErrors?.displayName ? (
-          <span className="font-mono text-caption uppercase tracking-[0.04em] text-error">
+          <span
+            id="settings-display-name-error"
+            className="font-mono text-caption uppercase tracking-[0.04em] text-error"
+            role="alert"
+          >
             {sanitizeUserFacingPlainText(fieldErrors.displayName)}
           </span>
         ) : (
-          <span className="font-mono text-caption uppercase tracking-[0.04em] text-muted">
+          <span
+            id="settings-display-name-hint"
+            className="font-mono text-caption uppercase tracking-[0.04em] text-muted"
+          >
             Optional. Shown where the product needs a human-readable label.
           </span>
         )}
@@ -406,7 +417,16 @@ export function SettingsListeningHistoryPublicForm() {
           checked={listeningHistoryPublic}
           disabled={pending}
           onChange={(ev) => {
-            void submitListeningHistoryPublic(ev.target.checked);
+            const next = ev.target.checked;
+            if (next && !listeningHistoryPublic) {
+              const ok = window.confirm(
+                "Make Explore and Archive public? Anyone with the URL will see your listening history (play counts, timelines, and listen rows). You can turn this off anytime.",
+              );
+              if (!ok) {
+                return;
+              }
+            }
+            void submitListeningHistoryPublic(next);
           }}
         />
         <span>
@@ -460,13 +480,26 @@ export function SettingsDataSourcesProfileForm() {
             onChange={(ev) => setLastfmUsername(ev.target.value)}
             maxLength={64}
             className="vs-control"
+            aria-invalid={fieldErrors?.lastfmUsername ? true : undefined}
+            aria-describedby={
+              fieldErrors?.lastfmUsername
+                ? "settings-lastfm-username-error"
+                : "settings-lastfm-username-hint"
+            }
           />
           {fieldErrors?.lastfmUsername ? (
-            <span className="font-mono text-caption uppercase tracking-[0.04em] text-error">
+            <span
+              id="settings-lastfm-username-error"
+              className="font-mono text-caption uppercase tracking-[0.04em] text-error"
+              role="alert"
+            >
               {sanitizeUserFacingPlainText(fieldErrors.lastfmUsername)}
             </span>
           ) : (
-            <span className="font-mono text-caption uppercase tracking-[0.04em] text-muted">
+            <span
+              id="settings-lastfm-username-hint"
+              className="font-mono text-caption uppercase tracking-[0.04em] text-muted"
+            >
               Stored trimmed. When set, 1–64 characters—the same rule as the Last.fm username on
               import jobs. Clear the field and save to unset.
             </span>
@@ -486,13 +519,26 @@ export function SettingsDataSourcesProfileForm() {
               maxLength={128}
               placeholder={hasLastfmApiKey ? "Enter a new key to replace the saved one" : ""}
               className="vs-control"
+              aria-invalid={fieldErrors?.lastfmApiKey ? true : undefined}
+              aria-describedby={
+                fieldErrors?.lastfmApiKey
+                  ? "settings-lastfm-api-key-error"
+                  : "settings-lastfm-api-key-hint"
+              }
             />
             {fieldErrors?.lastfmApiKey ? (
-              <span className="font-mono text-caption uppercase tracking-[0.04em] text-error">
+              <span
+                id="settings-lastfm-api-key-error"
+                className="font-mono text-caption uppercase tracking-[0.04em] text-error"
+                role="alert"
+              >
                 {sanitizeUserFacingPlainText(fieldErrors.lastfmApiKey)}
               </span>
             ) : (
-              <span className="font-mono text-caption uppercase tracking-[0.04em] text-muted">
+              <span
+                id="settings-lastfm-api-key-hint"
+                className="font-mono text-caption uppercase tracking-[0.04em] text-muted"
+              >
                 Optional per-account key from{" "}
                 <a
                   href="https://www.last.fm/api/account/create"
@@ -531,6 +577,12 @@ export function SettingsDataSourcesProfileForm() {
             value={statsTimezone}
             onChange={(ev) => setStatsTimezone(ev.target.value)}
             className="vs-control"
+            aria-invalid={fieldErrors?.statsTimezone ? true : undefined}
+            aria-describedby={
+              fieldErrors?.statsTimezone
+                ? "settings-stats-timezone-error"
+                : "settings-stats-timezone-hint"
+            }
           >
             <option value="">Auto (edge header when present, otherwise UTC)</option>
             {commonStatsTimeZonesGrouped().map(({ label, zones }) => (
@@ -544,11 +596,18 @@ export function SettingsDataSourcesProfileForm() {
             ))}
           </select>
           {fieldErrors?.statsTimezone ? (
-            <span className="font-mono text-caption uppercase tracking-[0.04em] text-error">
+            <span
+              id="settings-stats-timezone-error"
+              className="font-mono text-caption uppercase tracking-[0.04em] text-error"
+              role="alert"
+            >
               {sanitizeUserFacingPlainText(fieldErrors.statsTimezone)}
             </span>
           ) : (
-            <span className="font-mono text-caption uppercase tracking-[0.04em] text-muted">
+            <span
+              id="settings-stats-timezone-hint"
+              className="font-mono text-caption uppercase tracking-[0.04em] text-muted"
+            >
               Drives calendar labels on your home briefing and day buckets; rolling totals still use
               the same listen timestamps.
             </span>

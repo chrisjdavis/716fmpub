@@ -43,7 +43,7 @@ export function LoginForm({ nextPath }: Props) {
   return (
     <form className={signupFormShellClassName} onSubmit={onSubmit} aria-busy={pending}>
       <AuthEmailPasswordFields
-        hint="Use the same email you signed up with."
+        hint="Use the email from the owner account created at setup."
         hintId="login-email-hint"
         emailAriaDescribedBy="login-email-hint"
         passwordAutoComplete="current-password"

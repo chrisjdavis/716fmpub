@@ -97,23 +97,25 @@ export function SetupForm() {
         passwordAutoComplete="new-password"
         passwordMinLength={12}
       />
-      <label className="flex flex-col gap-2">
-        <span className="font-mono text-label uppercase tracking-[0.08em] text-overline">
-          Bootstrap secret
-          {bootstrapSecretRequired ? " (required)" : " (if configured)"}
-        </span>
-        <input
-          name="bootstrapSecret"
-          type="password"
-          autoComplete="off"
-          required={bootstrapSecretRequired}
-          className="vs-control"
-          placeholder="VS_SETUP_BOOTSTRAP_SECRET"
-        />
-        <span className="font-mono text-caption uppercase tracking-[0.04em] text-muted">
-          Matches the server env var that prevents unauthenticated instance claim.
-        </span>
-      </label>
+      {bootstrapSecretRequired ? (
+        <label className="flex flex-col gap-2">
+          <span className="font-mono text-label uppercase tracking-[0.08em] text-overline">
+            Instance claim password
+          </span>
+          <input
+            name="bootstrapSecret"
+            type="password"
+            autoComplete="off"
+            required
+            className="vs-control"
+            placeholder="From your server environment"
+          />
+          <span className="font-sans text-caption text-muted">
+            Only needed because this instance set a setup password in the server environment. Paste
+            the same value you configured there — it is not a third account password.
+          </span>
+        </label>
+      ) : null}
       {error ? (
         <p
           className="font-mono text-caption uppercase tracking-[0.04em] text-error"

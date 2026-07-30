@@ -17,30 +17,30 @@ const VARIANT_COPY: Readonly<
   >
 > = {
   explore: {
-    eyebrow: "Advanced plan",
-    title: "Musical Time Machine is available on Advanced",
-    body: "Month narratives, timeline eras, and supporting listening insights on this surface require an Advanced subscription. Your canonical plays and the full archive remain available on Core.",
+    eyebrow: "Insights pending",
+    title: "Musical Time Machine insights are not ready yet",
+    body: "Month narratives and supporting listening insights need the stats foundation to finish. Your canonical plays and the full archive stay available.",
     links: [
       { href: "/dashboard/archive", label: "Open listening archive" },
       { href: "/dashboard", label: "Back to home" },
     ],
   },
   home: {
-    eyebrow: "Advanced plan",
-    title: "Listening insights are available on Advanced",
-    body: "Your personalized home briefing, comparisons, and bundled listening rollups require an Advanced subscription. Your import and the listening archive remain available on Core.",
+    eyebrow: "Insights pending",
+    title: "Listening insights are not ready yet",
+    body: "Your home briefing and comparisons need the stats foundation to finish. Import status and the listening archive stay available.",
     links: [
       { href: "/dashboard/archive", label: "Open listening archive" },
-      { href: "/dashboard/explore", label: "Musical Time Machine (Advanced)" },
+      { href: "/dashboard/explore", label: "Musical Time Machine" },
     ],
   },
   archive: {
-    eyebrow: "Advanced plan",
-    title: "Window highlights are available on Advanced",
-    body: "Top album and top artist cards for the selected window use the same Advanced-gated listening summary as your home briefing. Tape play totals still use canonical listens on Core.",
+    eyebrow: "Insights pending",
+    title: "Window highlights are not ready yet",
+    body: "Top album and top artist cards for this window use the same listening summary as your home briefing. Tape play totals still use canonical listens.",
     links: [
       { href: "/dashboard", label: "Back to home" },
-      { href: "/dashboard/explore", label: "Musical Time Machine (Advanced)" },
+      { href: "/dashboard/explore", label: "Musical Time Machine" },
     ],
   },
 };

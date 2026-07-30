@@ -49,7 +49,7 @@ function spreadYearMarkers(minYear: number, maxYear: number): number[] {
 }
 
 const ctaButtonClass =
-  "h-9 rounded-md border border-hairline px-3.5 font-mono text-caption uppercase tracking-[0.08em] text-muted motion-safe:transition-[transform,background-color,border-color,color] motion-safe:duration-200 motion-safe:ease-out hover:border-display/25 hover:bg-raised motion-safe:active:scale-[0.98]";
+  "min-h-11 rounded-md border border-hairline px-3.5 font-mono text-caption uppercase tracking-[0.08em] text-muted motion-safe:transition-[transform,background-color,border-color,color] motion-safe:duration-200 motion-safe:ease-out hover:border-display/25 hover:bg-raised motion-safe:active:scale-[0.98]";
 
 export function DashboardTimeMachineScrubber({
   timeline,
@@ -235,7 +235,7 @@ export function DashboardTimeMachineScrubber({
             type="button"
             className={`${ctaButtonClass} ${
               timelineView === "new-music"
-                ? "border-[rgb(37_99_235)]/50 bg-[rgb(37_99_235)]/[0.14] text-[rgb(37_99_235)]"
+                ? "border-[rgb(var(--accent-new-music-rgb)/0.5)] bg-[rgb(var(--accent-new-music-rgb)/0.14)] text-[rgb(var(--accent-new-music-rgb))]"
                 : ""
             } disabled:pointer-events-none disabled:opacity-40`}
             disabled={newMusicTimeline.length === 0}

@@ -19,11 +19,14 @@ export function DashboardTimeMachineExplore({
   statsFoundationPending,
   explorePath = "/dashboard/explore",
   archivePath = "/dashboard/archive",
+  viewer = "owner",
 }: Readonly<{
   model: TimeMachineExploreModel;
   statsFoundationPending: boolean;
   explorePath?: string;
   archivePath?: string;
+  /** Public Explore mirrors the owner UI but must not say "Your". */
+  viewer?: "owner" | "public";
 }>) {
   const { copy, anchorStrip } = model;
   const archiveHref = `${archivePath}?month=${encodeURIComponent(model.monthYyyMm)}`;
@@ -32,6 +35,12 @@ export function DashboardTimeMachineExplore({
     Boolean(exploreNarrativePlainText(copy.comparisonNarrative).trim()) ||
     Boolean(exploreNarrativePlainText(copy.continuityNarrative).trim()) ||
     copy.detailLines.length > 0;
+  const headline =
+    viewer === "public" ? "Musical time machine" : "Your musical time machine";
+  const subhead =
+    viewer === "public"
+      ? "Scrub the timeline. Each month reveals a different fingerprint from this archive."
+      : "Scrub the timeline. Each month reveals a different fingerprint from your history.";
 
   return (
     <div className={`${styles.canvas} ${styles.canvasStack} w-full min-w-0 max-w-none`}>
@@ -43,10 +52,10 @@ export function DashboardTimeMachineExplore({
           id="time-machine-title"
           className="w-full max-w-none font-display text-[2.625rem] font-normal leading-[2.875rem] tracking-tight text-foreground md:text-[4.5rem] md:leading-[4.75rem]"
         >
-          Your musical time machine
+          {headline}
         </h1>
         <p className="w-full max-w-none font-sans text-lg leading-3 leading-relaxed text-muted">
-          Scrub the timeline. Each month reveals a different fingerprint from your history.
+          {subhead}
         </p>
       </section>
 
@@ -76,7 +85,7 @@ export function DashboardTimeMachineExplore({
                   model.timelineView === "new-music" ? styles.archiveCtaNewMusic : ""
                 } inline-flex h-10 shrink-0 items-center justify-center rounded-md border px-4 font-sans text-base font-medium no-underline hover:no-underline ${
                   model.timelineView === "new-music"
-                    ? "border-[rgb(37_99_235)] bg-[rgb(37_99_235)] text-white hover:text-white hover:bg-[rgb(37_99_235)]/92"
+                    ? "border-[rgb(var(--accent-new-music-rgb))] bg-[rgb(var(--accent-new-music-rgb))] text-white hover:text-white hover:bg-[rgb(var(--accent-new-music-rgb)/0.92)]"
                     : "border-brand bg-brand text-neutral-950"
                 }`}
               >

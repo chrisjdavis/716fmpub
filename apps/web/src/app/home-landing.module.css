@@ -130,7 +130,7 @@
 }
 
 .page a.button.buttonPrimary {
-  color: #000000;
+  color: var(--black);
 }
 
 .page a.button.buttonPrimary:hover,
@@ -143,8 +143,8 @@
 }
 
 .buttonPrimary {
-  background: #ffffff;
-  color: #000000;
+  background: var(--text-display);
+  color: var(--black);
 }
 
 .buttonPrimary:hover,
@@ -1232,73 +1232,4 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-secondary);
-}
-
-/* —— Scroll-native editorial (progressive enhancement) —— */
-@keyframes landing-scroll-read-line {
-  from {
-    transform: scaleY(0);
-  }
-
-  to {
-    transform: scaleY(1);
-  }
-}
-
-.scrollReadLine {
-  display: none;
-}
-
-/* IO-driven reveals (see `home-landing-scroll-reveal.tsx`); `view()` was not visible with this layout. */
-@media (prefers-reduced-motion: no-preference) {
-  .page[data-landing-reveal-live="yes"] [data-landing-reveal] {
-    transition:
-      opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .page[data-landing-reveal-live="yes"] [data-landing-reveal].landingRevealPending {
-    opacity: 0;
-    transform: translate3d(0, 0.75rem, 0);
-  }
-
-  .page[data-landing-reveal-live="yes"] [data-landing-reveal].landingRevealOn {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-
-  /*
-   * First paint with `.landingRevealOn` (above-the-fold): animate from the same off-state as
-   * `.landingRevealPending` without a prior “hide everything” frame (avoids load flicker).
-   */
-  @starting-style {
-    .page[data-landing-reveal-live="yes"] [data-landing-reveal].landingRevealOn {
-      opacity: 0;
-      transform: translate3d(0, 0.75rem, 0);
-    }
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: scroll(root block)) {
-    .scrollReadLine {
-      display: block;
-      position: fixed;
-      top: 0;
-      left: max(0px, env(safe-area-inset-left));
-      width: 2px;
-      height: 100dvh;
-      z-index: 30;
-      pointer-events: none;
-      background: rgb(var(--brand-rgb));
-      opacity: 0.55;
-      transform-origin: top center;
-      transform: scaleY(0);
-      animation-name: landing-scroll-read-line;
-      animation-duration: 1ms;
-      animation-timing-function: linear;
-      animation-fill-mode: both;
-      animation-timeline: scroll(root block);
-    }
-  }
 }

@@ -47,11 +47,17 @@ export function DashboardTimeMachineAnchorStrip({
                   href={href}
                   className={styles.anchorCoverButton}
                   title={`${item.title}${item.subtitle ? ` — ${item.subtitle}` : ""}`}
+                  aria-label={alt}
                 >
                   {cell}
                 </Link>
               ) : (
-                <span className={styles.anchorCoverStatic} title={`${item.title}${item.subtitle ? ` — ${item.subtitle}` : ""}`}>
+                <span
+                  className={styles.anchorCoverStatic}
+                  title={`${item.title}${item.subtitle ? ` — ${item.subtitle}` : ""}`}
+                  aria-label={alt}
+                  role="img"
+                >
                   {cell}
                 </span>
               )}
