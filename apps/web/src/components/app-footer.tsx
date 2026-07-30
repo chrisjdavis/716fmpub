@@ -18,21 +18,7 @@ export function AppFooter() {
         <span className="text-faint" aria-hidden>
           ·
         </span>
-        <Link href="/terms" className={footerLinkClass}>
-          Terms
-        </Link>
-        <span className="text-faint" aria-hidden>
-          ·
-        </span>
-        <Link href="/privacy" className={footerLinkClass}>
-          Privacy
-        </Link>
-        <span className="hidden text-faint sm:inline" aria-hidden>
-          ·
-        </span>
-        <span className="w-full text-center sm:w-auto sm:text-left">
-          © 2024 - 2026 716 Ventures, LLC. Open source (MIT).
-        </span>
+        <span>Apache License 2.0.</span>
       </p>
     </footer>
   );

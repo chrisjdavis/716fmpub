@@ -152,12 +152,8 @@ export default async function ExportPage() {
                 <li>Timestamps and source metadata</li>
               </ul>
               <p className="mt-5 w-full min-w-0 border-t border-hairline pt-5 font-sans text-sm leading-relaxed text-muted md:text-base">
-                How we handle your account and listening history — including exports — is summarized
-                in the{" "}
-                <Link href="/privacy" className="text-interactive underline-offset-2 hover:underline">
-                  Privacy policy
-                </Link>
-                .
+                Exports include the archive stored on this instance. You can delete listening data
+                anytime from Settings.
               </p>
             </aside>
           </section>

@@ -634,6 +634,16 @@
   }
 }
 
+.specKicker {
+  margin: 0;
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-overline);
+}
+
 .specSub {
   margin: 0;
   font-family: var(--font-body), system-ui, sans-serif;
@@ -641,6 +651,53 @@
   line-height: 1.55;
   max-width: 65ch;
   color: var(--text-primary);
+}
+
+.specInlineEm {
+  color: var(--text-display);
+}
+
+.specTeaserList {
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 40rem;
+}
+
+.specTeaserRow {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.75rem 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.specTeaserIndex {
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.specTeaserName {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  color: var(--text-display);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.specTeaserMeta {
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .specCta {

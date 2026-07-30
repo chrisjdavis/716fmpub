@@ -29,10 +29,6 @@ export default async function VerifyEmailPage({
             <Link href="/" className="text-interactive no-underline hover:underline">
               Home
             </Link>
-            <span className="mx-2 text-faint">/</span>
-            <Link href="/login" className="text-interactive no-underline hover:underline">
-              Sign in
-            </Link>
           </nav>
         </header>
         {token.length >= 32 ? (

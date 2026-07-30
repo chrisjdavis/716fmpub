@@ -1,160 +1,224 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PRODUCT_NAME } from "@vs/domain";
+import { redirect } from "next/navigation";
+import {
+  countListensForUser,
+  getPool,
+  getSoleOwnerPublicListeningAccess,
+  resolveDashboardAnalyticsBundleRead,
+} from "@vs/db";
+import { PRODUCT_NAME, sanitizeUserFacingPlainText } from "@vs/domain";
+import { loadServerEnv } from "@vs/env";
 import { AppBrandMark } from "@/components/app-brand-mark";
+import { PublicHomeTopbarActions } from "@/components/public-site-header-nav";
 import { getServerSession } from "@/server/auth/get-server-session";
 import { isInstanceConfigured } from "@/server/instance-configured";
-import { AppPrimaryNav } from "@/app/dashboard/app-primary-nav";
-import { PublicHomeTopbarActions } from "@/components/public-site-header-nav";
-import { HomeHowItWorks } from "./home-how-it-works";
-import { HomeLandingScrollReveal } from "./home-landing-scroll-reveal";
+import {
+  PUBLIC_ARCHIVE_PATH,
+  PUBLIC_EXPLORE_PATH,
+} from "@/server/listening-surface-routes";
 import styles from "./home-landing.module.css";
 
 export const metadata: Metadata = {
   title: PRODUCT_NAME,
   description:
-    "Self-hosted Last.fm listening analytics. Import your history, explore it, and keep full control of your data.",
+    "Self-hosted Last.fm listening analytics. One owner account, full archive control.",
 };
 
-export default async function HomePage() {
-  const session = await getServerSession();
-  const configured = await isInstanceConfigured();
-  const primaryHref = session
-    ? "/dashboard"
-    : configured
-      ? "/login"
-      : "/setup";
-  const primaryLabel = session ? "Open dashboard" : configured ? "Sign in" : "Set up";
+type HomeShellProps = Readonly<{
+  children: React.ReactNode;
+  /** First-run only — Set up may appear in the topbar. */
+  showSetupInHeader?: boolean;
+}>;
 
+function HomeShell({ children, showSetupInHeader = false }: HomeShellProps) {
   return (
-    <div className={styles.page} data-landing-reveal-root>
-      <div className={styles.scrollReadLine} aria-hidden />
-      <HomeLandingScrollReveal />
-      <header
-        className={
-          session
-            ? `${styles.shellOuter} border-b border-hairline py-6 md:py-8`
-            : styles.shellOuter
-        }
-      >
-        {session ? (
-          <div
-            className={`${styles.shellInner} flex min-w-0 items-center justify-between gap-4`}
+    <div className={styles.page}>
+      <header className={styles.shellOuter}>
+        <div className={`${styles.shellInner} ${styles.specTopbar}`}>
+          <Link
+            href="/"
+            className={`${styles.brandLine} text-inherit no-underline hover:no-underline hover:opacity-90`}
           >
-            <Link
-              href="/"
-              className={`${styles.brandLine} shrink-0 text-inherit no-underline hover:no-underline hover:opacity-90`}
-            >
-              <AppBrandMark />
-              <span className={styles.brandName}>{PRODUCT_NAME}</span>
-            </Link>
-            <AppPrimaryNav />
+            <AppBrandMark />
+            <span className={styles.brandName}>{PRODUCT_NAME}</span>
+          </Link>
+          <div className={styles.specTopbarActions}>
+            <PublicHomeTopbarActions
+              linkClassName={styles.specTopLink}
+              setupHref={showSetupInHeader ? "/setup" : undefined}
+            />
           </div>
-        ) : (
-          <div className={`${styles.shellInner} ${styles.specTopbar}`}>
-            <Link
-              href="/"
-              className={`${styles.brandLine} text-inherit no-underline hover:no-underline hover:opacity-90`}
-            >
-              <AppBrandMark />
-              <span className={styles.brandName}>{PRODUCT_NAME}</span>
-            </Link>
-            <div className={styles.specTopbarActions}>
-              <PublicHomeTopbarActions
-                primaryHref={primaryHref}
-                primaryLabel={primaryLabel}
-                linkClassName={styles.specTopLink}
-              />
-            </div>
-          </div>
-        )}
+        </div>
       </header>
 
       <main className={styles.shellOuter}>
-        <div className={`${styles.shellInner} ${styles.specMain}`}>
-          <div className={styles.specLayoutGrid}>
-            <section
-              className={styles.specHeroSection}
-              aria-labelledby="hero-title"
-              data-landing-reveal
-            >
-              <div className={styles.specHeroLeft}>
-                <h1 id="hero-title" className={`${styles.specHeadline} ${styles.specHeadlineSentence}`}>
-                  Own your music history
-                </h1>
-                <p className={styles.specSub}>
-                  Self-hosted Last.fm listening analytics. Import your archive, explore it, and keep
-                  full control on your own machine.
-                </p>
-                <div className={styles.specHeroActions}>
-                  <Link href={primaryHref} className={styles.specCta}>
-                    {primaryLabel}
-                  </Link>
-                  <Link href="#how-it-works" className={styles.specCtaSecondary}>
-                    See how it works
-                  </Link>
-                </div>
-              </div>
-            </section>
+        <div className={`${styles.shellInner} ${styles.specMain}`}>{children}</div>
+      </main>
+    </div>
+  );
+}
 
-            <div className={styles.specSectionsWrap}>
-              <section
-                className={styles.specSection}
-                aria-labelledby="why-title"
-                data-landing-reveal
-              >
-                <h2 id="why-title" className={styles.specSectionTitle}>
-                  Single-user, open source, all features unlocked.
-                </h2>
-                <p className={styles.specSectionBody}>
-                  One local account. No signup invites, no admin console, no plan gates. Connect
-                  Last.fm, import scrobbles, and use the full dashboard, archive, explore, and export
-                  tools.
-                </p>
-              </section>
+function formatListenCount(n: number): string {
+  return n.toLocaleString("en-US");
+}
 
-              <section
-                className={styles.specSection}
-                id="how-it-works"
-                aria-labelledby="how-title"
-                data-landing-reveal
-              >
-                <h2 id="how-title" className={styles.specSectionTitle}>
-                  How it works
-                </h2>
-                <HomeHowItWorks />
-              </section>
+export default async function HomePage() {
+  const session = await getServerSession();
+  if (session) {
+    redirect("/dashboard");
+  }
 
-              <section
-                className={styles.specSection}
-                aria-labelledby="final-cta-title"
-                data-landing-reveal
-              >
-                <h2 id="final-cta-title" className={styles.specSectionTitle}>
-                  Bring your history somewhere that respects it.
-                </h2>
-                <Link href={primaryHref} className={styles.specCta}>
-                  {primaryLabel}
+  const configured = await isInstanceConfigured();
+
+  if (!configured) {
+    return (
+      <HomeShell showSetupInHeader>
+        <div className={styles.specLayoutGrid}>
+          <section className={styles.specHeroSection} aria-labelledby="hero-title">
+            <div className={styles.specHeroLeft}>
+              <p className={styles.specKicker}>First run</p>
+              <h1 id="hero-title" className={`${styles.specHeadline} ${styles.specHeadlineSentence}`}>
+                Create the owner account
+              </h1>
+              <p className={styles.specSub}>
+                This is a single-user instance. Set up once, connect Last.fm, and keep your listening
+                history on your own machine — no signup invites or plan gates.
+              </p>
+              <div className={styles.specHeroActions}>
+                <Link href="/setup" className={styles.specCta}>
+                  Set up
                 </Link>
-              </section>
+              </div>
+            </div>
+          </section>
+        </div>
+      </HomeShell>
+    );
+  }
+
+  const env = loadServerEnv();
+  const pool = getPool(env);
+  const access = await getSoleOwnerPublicListeningAccess(pool);
+
+  if (!access) {
+    return (
+      <HomeShell>
+        <div className={styles.specLayoutGrid}>
+          <section className={styles.specHeroSection} aria-labelledby="hero-title">
+            <div className={styles.specHeroLeft}>
+              <p className={styles.specKicker}>Owner access</p>
+              <h1 id="hero-title" className={`${styles.specHeadline} ${styles.specHeadlineSentence}`}>
+                Sign in to this instance
+              </h1>
+              <p className={styles.specSub}>
+                Listening history is private. Sign in to open the dashboard, archive, explore, and
+                export tools — or enable public Explore and Archive in Settings.
+              </p>
+              <div className={styles.specHeroActions}>
+                <Link href="/login" className={styles.specCta}>
+                  Sign in
+                </Link>
+              </div>
+            </div>
+          </section>
+        </div>
+      </HomeShell>
+    );
+  }
+
+  const [listenCount, bundleRead] = await Promise.all([
+    countListensForUser(pool, access.userId),
+    resolveDashboardAnalyticsBundleRead(pool, access.userId),
+  ]);
+
+  const ownerLabelRaw = access.display_name?.trim() || null;
+  const ownerLabel = ownerLabelRaw
+    ? sanitizeUserFacingPlainText(ownerLabelRaw)
+    : null;
+
+  const archiveTotals =
+    bundleRead.status === "fresh" ? bundleRead.bundle.archive_totals : null;
+  const displayListenCount =
+    archiveTotals != null ? archiveTotals.allTimeScrobbles : listenCount;
+  const topArtists =
+    bundleRead.status === "fresh"
+      ? bundleRead.bundle.ranges.all.summary.top_artists.slice(0, 5).map((a) => ({
+          name: sanitizeUserFacingPlainText(a.name),
+          plays: a.plays,
+        }))
+      : [];
+  const topArtistFallback =
+    archiveTotals?.topArtistName != null
+      ? sanitizeUserFacingPlainText(archiveTotals.topArtistName)
+      : null;
+
+  return (
+    <HomeShell>
+      <div className={styles.specLayoutGrid}>
+        <section className={styles.specHeroSection} aria-labelledby="hero-title">
+          <div className={styles.specHeroLeft}>
+            <p className={styles.specKicker}>Public listening</p>
+            <h1 id="hero-title" className={`${styles.specHeadline} ${styles.specHeadlineSentence}`}>
+              {ownerLabel ? `${ownerLabel}’s listening history` : "Listening history"}
+            </h1>
+            <p className={styles.specSub}>
+              {displayListenCount > 0 ? (
+                <>
+                  {formatListenCount(displayListenCount)} listens on this instance
+                  {topArtistFallback ? (
+                    <>
+                      {" "}
+                      · topped by <span className={styles.specInlineEm}>{topArtistFallback}</span>
+                    </>
+                  ) : null}
+                  . Browse Explore and Archive.
+                </>
+              ) : (
+                <>
+                  Public Explore and Archive are on. The archive is still empty — check back after
+                  import finishes.
+                </>
+              )}
+            </p>
+            <div className={styles.specHeroActions}>
+              <Link href={PUBLIC_EXPLORE_PATH} className={styles.specCta}>
+                Explore
+              </Link>
+              <Link href={PUBLIC_ARCHIVE_PATH} className={styles.specCtaSecondary}>
+                Archive
+              </Link>
             </div>
           </div>
-        </div>
-      </main>
+        </section>
 
-      <footer className={`${styles.shellOuter} ${styles.specFooter}`} aria-label="Site links">
-        <div className={`${styles.shellInner} ${styles.specFooterInner}`}>
-          <nav className={styles.specFooterNav} aria-label="Legal">
-            <Link href="/privacy" className={styles.specFooterLink}>
-              Privacy
-            </Link>
-            <Link href="/terms" className={styles.specFooterLink}>
-              Terms
-            </Link>
-          </nav>
-          <p className={styles.specFooterMeta}>{PRODUCT_NAME}</p>
-        </div>
-      </footer>
-    </div>
+        {topArtists.length > 0 ? (
+          <div className={styles.specSectionsWrap}>
+            <section className={styles.specSection} aria-labelledby="tops-title">
+              <h2 id="tops-title" className={styles.specSectionTitle}>
+                Top artists
+              </h2>
+              <p className={styles.specSectionLead}>All-time on this instance</p>
+              <ol className={styles.specTeaserList}>
+                {topArtists.map((artist, i) => (
+                  <li key={`${artist.name}-${i}`} className={styles.specTeaserRow}>
+                    <span className={styles.specTeaserIndex}>{String(i + 1).padStart(2, "0")}</span>
+                    <span className={styles.specTeaserName}>{artist.name}</span>
+                    <span className={styles.specTeaserMeta}>
+                      {formatListenCount(artist.plays)} plays
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <div className={styles.specHeroActions}>
+                <Link href={PUBLIC_EXPLORE_PATH} className={styles.specCtaSecondary}>
+                  Open Explore
+                </Link>
+              </div>
+            </section>
+          </div>
+        ) : null}
+      </div>
+    </HomeShell>
   );
 }

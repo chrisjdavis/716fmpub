@@ -230,15 +230,7 @@ export function SettingsTabsLayout({
             Export
           </h2>
           <p className="font-sans text-body text-muted">
-            JSON, CSV, and filtered exports. For retention and portability, see the{" "}
-            <Link
-              href="/privacy"
-              className="text-interactive underline-offset-2 hover:underline"
-              prefetch={false}
-            >
-              Privacy policy
-            </Link>
-            .
+            JSON, CSV, and filtered exports of your listening history.
           </p>
           <Link
             href="/dashboard/export"
@@ -259,15 +251,8 @@ export function SettingsTabsLayout({
             Deletion
           </h2>
           <p className="font-sans text-body text-muted">
-            Permanent removal of listen and import data is described in the{" "}
-            <Link
-              href="/privacy"
-              className="text-interactive underline-offset-2 hover:underline"
-              prefetch={false}
-            >
-              Privacy policy
-            </Link>
-            . Account login is not removed by the reset below.
+            Permanent removal of listen and import data. Account login is not removed by the reset
+            below.
           </p>
           <SettingsListenDataReset confirmPhrase={listenDataConfirmPhrase} />
           <SettingsAccountDelete confirmPhrase={accountDeleteConfirmPhrase} />

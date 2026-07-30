@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   DELETE_USER_ACCOUNT_CONFIRM_PHRASE,
   getPool,
@@ -41,15 +40,8 @@ export default async function SettingsPage() {
             <p className="font-mono text-label uppercase tracking-[0.1em] text-overline">Settings</p>
             <h1 className="font-display text-display-md text-display">Control center</h1>
             <p className="font-sans text-body text-muted">
-              How we handle your account, exports, and deletion is summarized in the{" "}
-              <Link
-                href="/privacy"
-                className="text-interactive underline-offset-2 hover:underline"
-                prefetch={false}
-              >
-                Privacy policy
-              </Link>
-              .
+              Manage your account, data sources, exports, and deletion for this self-hosted
+              instance.
             </p>
           </header>
 

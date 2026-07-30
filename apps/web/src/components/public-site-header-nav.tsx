@@ -25,6 +25,9 @@ const authLinkClass = "text-interactive no-underline hover:underline";
 export type PublicSiteHeaderNavActive = "explore" | "archive" | null;
 
 function CompactSlashNav({ items }: Readonly<{ items: readonly ReactNode[] }>) {
+  if (items.length === 0) {
+    return null;
+  }
   return (
     <nav
       className="flex shrink-0 flex-wrap items-center justify-end gap-x-0 gap-y-2 font-mono text-caption uppercase tracking-[0.06em] text-muted"
@@ -47,13 +50,14 @@ function CompactSlashNav({ items }: Readonly<{ items: readonly ReactNode[] }>) {
 /**
  * Header nav for public (non-dashboard) surfaces.
  * When listening history is public, Explore and Archive links are included.
+ * Sign in lives in the global footer only — never in the header.
  */
 export async function PublicSiteHeaderNav({
   active = null,
   variant = "rail",
 }: Readonly<{
   active?: PublicSiteHeaderNavActive;
-  /** `rail` — brand header underline links; `compact` — slash-separated legal/auth style. */
+  /** `rail` — brand header underline links; `compact` — slash-separated style. */
   variant?: "rail" | "compact";
 }>) {
   const [session, listeningPublic] = await Promise.all([
@@ -91,14 +95,13 @@ export async function PublicSiteHeaderNav({
           Dashboard
         </Link>,
       );
-    } else {
-      items.push(
-        <Link key="login" href="/login" className={compactLinkClass}>
-          Sign in
-        </Link>,
-      );
     }
     return <CompactSlashNav items={items} />;
+  }
+
+  const hasLinks = listeningPublic || session;
+  if (!hasLinks) {
+    return null;
   }
 
   return (
@@ -131,14 +134,7 @@ export async function PublicSiteHeaderNav({
         >
           Dashboard
         </Link>
-      ) : (
-        <Link
-          href="/login"
-          className="inline-flex items-center font-mono text-caption uppercase tracking-[0.1em] text-interactive no-underline hover:underline"
-        >
-          Sign in
-        </Link>
-      )}
+      ) : null}
     </nav>
   );
 }
@@ -171,18 +167,22 @@ export async function PublicListeningAuthNavPrefix() {
 }
 
 /**
- * Home landing topbar actions: Explore / Archive (when public) + primary CTA.
+ * Home landing topbar: Explore / Archive when public; optional first-run Set up.
+ * Sign in is footer-only.
  */
 export async function PublicHomeTopbarActions({
-  primaryHref,
-  primaryLabel,
   linkClassName,
+  setupHref,
 }: Readonly<{
-  primaryHref: string;
-  primaryLabel: string;
   linkClassName: string;
+  /** When set (unconfigured instance), show Set up in the topbar. */
+  setupHref?: string;
 }>) {
   const listeningPublic = await isPublicListeningHistoryEnabled();
+  const showAnything = listeningPublic || setupHref;
+  if (!showAnything) {
+    return null;
+  }
   return (
     <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
       {listeningPublic ? (
@@ -195,9 +195,11 @@ export async function PublicHomeTopbarActions({
           </Link>
         </>
       ) : null}
-      <Link href={primaryHref} className={linkClassName}>
-        {primaryLabel}
-      </Link>
+      {setupHref ? (
+        <Link href={setupHref} className={linkClassName}>
+          Set up
+        </Link>
+      ) : null}
     </div>
   );
 }
