@@ -1,0 +1,43 @@
+{
+  "name": "716fmpub",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "dotenv -e .env -- npm run dev -w web",
+    "dev:worker": "dotenv -e .env -- npm run dev -w worker",
+    "dev:realtime": "dotenv -e .env -- npm run dev -w realtime",
+    "run:all": "dotenv -e .env -- concurrently -k -n web,worker,realtime -c blue,magenta,green \"npm run dev -w web\" \"npm run dev -w worker\" \"npm run dev -w realtime\"",
+    "start:worker": "dotenv -e .env -- npm run start -w worker",
+    "build": "npm run build -w web && npm run typecheck -w worker",
+    "lint": "npm run lint -w web",
+    "test": "npm run test -w @vs/feature-flags && npm run test -w @vs/env && npm run test -w @vs/mailer && npm run typecheck -w @vs/mailer && npm run test -w @vs/sensitive && npm run typecheck -w @vs/sensitive && npm run test -w @vs/queue && npm run typecheck -w @vs/queue && npm run test -w @vs/realtime-token && npm run typecheck -w @vs/db && npm run test -w @vs/db && npm run test -w @vs/domain && npm run typecheck -w @vs/lastfm-provider && npm run test -w @vs/lastfm-provider && npm run typecheck -w realtime && npm run test -w realtime && npm run test -w worker && npm run test -w web",
+    "db:migrate": "dotenv -e .env -- npm run migrate -w @vs/db",
+    "db:migrate:down": "dotenv -e .env -- npm run migrate:down -w @vs/db",
+    "db:validate": "dotenv -e .env -- npm run validate -w @vs/db",
+    "db:bootstrap:account-role": "dotenv -e .env -- npm run bootstrap:account-role -w @vs/db",
+    "db:seed:local": "dotenv -e .env -- npm run seed:local -w web",
+    "smoke:local": "dotenv -e .env -- npm run smoke:local -w web",
+    "mailer:smoke": "dotenv -e .env -- npm run smoke:mailgun -w @vs/mailer",
+    "lastfm:dump": "dotenv -e .env -- node scripts/lastfm-dump-sample.mjs",
+    "enqueue:smoke-test": "dotenv -e .env -- npm run enqueue:smoke-test -w worker",
+    "enqueue:layer1-recompute": "dotenv -e .env -- npm run enqueue:layer1-recompute -w worker",
+    "inspect:bullmq-queues": "dotenv -e .env -- npm run inspect:bullmq-queues -w worker",
+    "inspect:stalled-db-jobs": "dotenv -e .env -- npm run inspect:stalled-db-jobs -w worker"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "overrides": {
+    "axios": "^1.15.0",
+    "bullmq": {
+      "uuid": "^14.0.0"
+    }
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "dotenv-cli": "^8.0.0"
+  }
+}

@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scrollbar-gutter: stable;
+}
+
+:root {
+  /* Primary app column cap (was 72rem / max-w-6xl; ~77% after narrow +10% bump, +10% width). */
+  --app-content-max-width: calc(72rem * 0.7 * 1.1 * 1.1);
+  /* Auth-only: ~33% narrower than dashboard column so forms don’t span full app width. */
+  --auth-form-max-width: calc(var(--app-content-max-width) * 0.67);
+  /* Deep orange accent (home meta rail, stats range UI); space-separated for Tailwind alpha */
+  --brand-rgb: 255 87 34;
+  --black: #f5f5f5;
+  --surface: #ffffff;
+  --surface-raised: #f0f0f0;
+  --border: #e8e8e8;
+  --border-visible: #cccccc;
+  --text-disabled: #999999;
+  --text-secondary: #666666;
+  --text-primary: #1a1a1a;
+  --text-display: #000000;
+  --accent: #666666;
+  --success: #4a4a4a;
+  --warning: #8a7a40;
+  --interactive: #1a1a1a;
+  --error: #c62828;
+  --text-overline: color-mix(in srgb, rgb(var(--brand-rgb)) 28%, var(--text-secondary) 72%);
+}
+
+html.dark {
+  --brand-rgb: 255 87 34;
+  /* Warm-tinted neutrals (dashboard / ledger canvas; subtle chroma toward brand hue). */
+  --black: oklch(0.09 0.006 55);
+  --surface: oklch(0.105 0.007 55);
+  --surface-raised: oklch(0.155 0.011 55);
+  --border: oklch(0.24 0.014 55);
+  --border-visible: oklch(0.32 0.017 55);
+  --text-disabled: #555555;
+  --text-secondary: #888888;
+  --text-primary: #f0f0f0;
+  --text-display: #ffffff;
+  --accent: #777777;
+  --success: #9a9a9a;
+  --warning: #a89455;
+  --interactive: #e8e8e8;
+  --error: #ff6b6b;
+  --text-overline: color-mix(in srgb, rgb(var(--brand-rgb)) 38%, var(--text-secondary) 62%);
+}
+
+body {
+  background-color: var(--black);
+  color: var(--text-primary);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1rem;
+  /* Slightly open leading on dark surfaces — type reads lighter and needs air (see .impeccable.md). */
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--interactive);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button:hover,
+button:focus-visible {
+  text-decoration: none;
+}
+
+@layer components {
+  /** Text fields — match dashboard / archive focus ring (brand, not flat interactive). */
+  .vs-control {
+    @apply w-full min-w-0 max-w-none border border-hairline bg-raised px-4 py-3 font-sans text-body text-foreground outline-none;
+    @apply focus-visible:ring-2 focus-visible:ring-brand/45 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas;
+  }
+
+  /** Primary actions — same treatment as Time Machine / Explore archive CTA. */
+  .vs-btn-primary {
+    @apply inline-flex items-center justify-center rounded-md border border-brand bg-brand px-8 py-3 font-mono text-label uppercase tracking-[0.1em] text-neutral-950 no-underline transition-opacity;
+    @apply hover:opacity-90 hover:no-underline disabled:pointer-events-none disabled:opacity-40;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/45 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas;
+  }
+}
+
+/*
+ * Replaced-element inputs: flex/grid parents can otherwise leave a ~20ch effective width.
+ * Ungated rule so it reliably fills the auth column.
+ */
+input.vs-control {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+/* Musical time machine — visible rail on dark canvas (range track was effectively invisible). */
+.time-machine-rail::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--border);
+  box-shadow: inset 0 0 0 1px var(--border-visible);
+}
+
+.time-machine-rail::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -5px;
+  border-radius: 9999px;
+  border: 2px solid var(--black);
+  background: rgb(var(--brand-rgb));
+}
+
+.time-machine-rail::-moz-range-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--border);
+  box-shadow: inset 0 0 0 1px var(--border-visible);
+}
+
+.time-machine-rail::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--black);
+  border-radius: 9999px;
+  background: rgb(var(--brand-rgb));
+  box-sizing: border-box;
+}
+
+/* Explore — “New Music” timeline (blue accent instead of brand orange). */
+.time-machine-rail--new-music::-webkit-slider-thumb {
+  background: rgb(37 99 235);
+}
+
+.time-machine-rail--new-music::-moz-range-thumb {
+  background: rgb(37 99 235);
+}

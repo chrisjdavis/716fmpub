@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 2,
+  "gitSha": "5647d36db21edde84f7798845a85d1352fb790f9",
+  "environment": {
+    "note": "Single warm-ish run on a developer machine after migrations + seed. Next.js dev server (not production start); timings include dev overhead and are not production SLOs.",
+    "webMode": "next dev -p 3460",
+    "databaseUrlHost": "127.0.0.1:55432",
+    "redisUrlHost": "127.0.0.1:56379"
+  },
+  "httpMs": {
+    "recordedAt": "2026-04-16T12:32:48.707Z",
+    "home_landing_html_msTotal": 84.09,
+    "auth_login_json_msTotal": 49.11,
+    "stats_dashboard_html_msTotal": 59.38,
+    "archive_dashboard_html_msTotal": 62.66,
+    "export_dashboard_html_msTotal": 74.59,
+    "imports_dashboard_html_msTotal": 75.51,
+    "settings_dashboard_html_msTotal": 50.29,
+    "api_me_json_msTotal": 14.97,
+    "api_analytics_summary_json_msTotal": 20.39,
+    "api_imports_latest_json_msTotal": 14.2,
+    "api_me_listen_fingerprint_msTotal": 13.77,
+    "api_me_listen_realtime_handshake_msTotal": 15.03,
+    "api_export_listens_post_msTotal": 24.76,
+    "api_export_listens_post_status": 202
+  },
+  "dbLoaderMs": {
+    "vs83Note": "After VS-83, re-run `npm run perf:baseline:db -w web` and replace this block for apples-to-apples; optional delta: VS83_PERF_PRIOR_JSON pointing at this file.",
+    "recordedAt": "2026-04-16T12:32:47.785Z",
+    "contract": "Aggregate Node-side loader wall time around @/server/*-page-data functions; not per-statement Postgres latency.",
+    "loadDashboardPageData_30d": 10.85,
+    "loadArchivePageData": 24.26,
+    "loadImportsPageData_page1": 11.95,
+    "getUserProfileFields": 60.47,
+    "perQueryPostgresMs": {
+      "value": null,
+      "captured": false,
+      "reason": "Requires pg_stat_statements or EXPLAIN (ANALYZE) per hot statement; not part of perf:baseline:db."
+    }
+  },
+  "nextBuildFirstLoadJsKb": {
+    "recordedAt": "2026-04-16 build after VS-64 fixes",
+    "sharedFirstLoadJs": 102,
+    "routes": {
+      "/": 109,
+      "/dashboard": 124,
+      "/dashboard/archive": 116,
+      "/dashboard/export": 107,
+      "/dashboard/imports": 122,
+      "/dashboard/settings": 109
+    },
+    "middlewareKb": 49.2
+  },
+  "benchmarkContract": {
+    "serverResponseTimes": {
+      "nextDevWarm": {
+        "captured": true,
+        "captureMode": "next_dev_warm",
+        "note": "Same numeric keys as httpMs; duplicated here for an explicit regression contract."
+      },
+      "nextStartAuthenticated": {
+        "value": null,
+        "unit": "ms",
+        "captured": false,
+        "reason": "next start runs with NODE_ENV=production; vs_session is Secure and Node fetch against http://127.0.0.1 will not persist cookies. Use HTTPS with a locally trusted cert, Playwright, or paste Lighthouse navigation timings into a sibling JSON file."
+      }
+    },
+    "websocket": {
+      "httpHandshakeListenRealtimeApiMs": 15.03,
+      "wsAuthToReadyMs": {
+        "value": null,
+        "captured": false,
+        "reason": "Run `npm run perf:baseline:ws -w web` while apps/realtime is up and listen-realtime returns enabled:true."
+      },
+      "notifyListenChangeToListensUpdatedMs": {
+        "value": null,
+        "captured": false,
+        "reason": "Requires realtime + a controlled listens INSERT/DELETE for the same user to fire listen_change; not executed in the default harness."
+      }
+    },
+    "clientRendering": {
+      "lighthouseLcpMs": {
+        "value": null,
+        "captured": false,
+        "reason": "Not captured in-repo; run Lighthouse (performance) and paste JSON summary here or add a dated sibling artifact."
+      },
+      "hydrationOrMainThreadMs": {
+        "value": null,
+        "captured": false,
+        "reason": "Browser main-thread metric; not derivable from server fetch timings."
+      },
+      "listenFingerprintPollIntervalMs": 20000,
+      "importStatusUpdates": {
+        "apiImportsLatestMsTotal": 14.2,
+        "note": "UI may also refresh via listen-fingerprint polling on this interval or via WebSocket listens_updated when realtime is enabled — those are separate contracts from this GET alone."
+      }
+    }
+  }
+}

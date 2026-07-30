@@ -1,0 +1,79 @@
+{
+  "name": "@vs/domain",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./auth-session-cookie": {
+      "types": "./src/authSessionCookieName.ts",
+      "default": "./src/authSessionCookieName.ts"
+    },
+    "./auth-csrf-cookie": {
+      "types": "./src/authCsrfCookieName.ts",
+      "default": "./src/authCsrfCookieName.ts"
+    },
+    "./auth-csrf-header": {
+      "types": "./src/authCsrfHeaderName.ts",
+      "default": "./src/authCsrfHeaderName.ts"
+    },
+    "./user-facing-plain-text": {
+      "types": "./src/userFacingPlainText.ts",
+      "default": "./src/userFacingPlainText.ts"
+    },
+    "./account-role": {
+      "types": "./src/accountRole.ts",
+      "default": "./src/accountRole.ts"
+    },
+    "./account-status": {
+      "types": "./src/accountStatus.ts",
+      "default": "./src/accountStatus.ts"
+    },
+    "./product-plan": {
+      "types": "./src/productPlan.ts",
+      "default": "./src/productPlan.ts"
+    },
+    "./product-entitlement": {
+      "types": "./src/productEntitlement.ts",
+      "default": "./src/productEntitlement.ts"
+    },
+    "./beta-invite-lifecycle": {
+      "types": "./src/betaInviteLifecycle.ts",
+      "default": "./src/betaInviteLifecycle.ts"
+    },
+    "./cover-art-archive-url": {
+      "types": "./src/import/coverArtArchiveUrl.ts",
+      "default": "./src/import/coverArtArchiveUrl.ts"
+    },
+    "./import/pipeline-stage": {
+      "types": "./src/import/pipelineStage.ts",
+      "default": "./src/import/pipelineStage.ts"
+    },
+    "./listen-fingerprint-poll": {
+      "types": "./src/listenFingerprintPoll.ts",
+      "default": "./src/listenFingerprintPoll.ts"
+    },
+    "./security-finding-lifecycle": {
+      "types": "./src/securityFindingLifecycle.ts",
+      "default": "./src/securityFindingLifecycle.ts"
+    },
+    "./evidence": {
+      "types": "./src/evidence/index.ts",
+      "default": "./src/evidence/index.ts"
+    }
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  }
+}

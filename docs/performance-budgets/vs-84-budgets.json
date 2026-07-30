@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "ticket": "VS-84",
+  "contract": "Ceilings for automated regression checks. First Load JS is enforced against `next build` output in CI (`npm run perf:check:budgets -w web`). HTTP and DB-loader envelopes are checked in Vitest against the committed snapshot `docs/performance-baseline/recorded-2026-04-16-local.json` (next dev warm numbers — not production SLOs).",
+  "firstLoadJsKb": {
+    "maxSharedFirstLoadJsKb": 118,
+    "maxMiddlewareKb": 58,
+    "enforcedRoutesMaxFirstLoadJsKb": {
+      "/": 126,
+      "/dashboard": 143,
+      "/dashboard/archive": 134,
+      "/dashboard/export": 124,
+      "/dashboard/imports": 141,
+      "/dashboard/settings": 126
+    }
+  },
+  "httpMsMax": {
+    "home_landing_html_msTotal": 200,
+    "auth_login_json_msTotal": 120,
+    "stats_dashboard_html_msTotal": 150,
+    "archive_dashboard_html_msTotal": 150,
+    "export_dashboard_html_msTotal": 150,
+    "imports_dashboard_html_msTotal": 150,
+    "settings_dashboard_html_msTotal": 120,
+    "api_me_json_msTotal": 80,
+    "api_analytics_summary_json_msTotal": 100,
+    "api_imports_latest_json_msTotal": 80,
+    "api_me_listen_fingerprint_msTotal": 80,
+    "api_me_listen_realtime_handshake_msTotal": 100,
+    "api_export_listens_post_msTotal": 120
+  },
+  "dbLoaderMsMax": {
+    "loadDashboardPageData_30d": 80,
+    "loadArchivePageData": 200,
+    "loadImportsPageData_page1": 100,
+    "getUserProfileFields": 250
+  }
+}

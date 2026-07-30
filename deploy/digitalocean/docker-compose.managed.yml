@@ -1,0 +1,138 @@
+name: 716fm-managed
+
+services:
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_started
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  web:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command:
+      - npm
+      - run
+      - start
+      - -w
+      - web
+      - --
+      - --hostname
+      - 0.0.0.0
+      - --port
+      - "3000"
+    env_file:
+      - path: ./managed.env
+        required: false
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      VS_WEB_INTERNAL_ORIGIN: http://web:3000
+      EXPORT_ARTIFACTS_DIR: /var/lib/716fm/export-artifacts
+      NEXT_TELEMETRY_DISABLED: "1"
+    volumes:
+      - export_artifacts:/var/lib/716fm/export-artifacts
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:3000/').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  worker:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command:
+      - npm
+      - run
+      - start
+      - -w
+      - worker
+    env_file:
+      - path: ./managed.env
+        required: false
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      VS_WEB_INTERNAL_ORIGIN: http://web:3000
+      EXPORT_ARTIFACTS_DIR: /var/lib/716fm/export-artifacts
+    volumes:
+      - export_artifacts:/var/lib/716fm/export-artifacts
+
+  realtime:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command:
+      - npm
+      - run
+      - start
+      - -w
+      - realtime
+    env_file:
+      - path: ./managed.env
+        required: false
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      EXPORT_ARTIFACTS_DIR: /var/lib/716fm/export-artifacts
+      LISTEN_REALTIME_PORT: 3457
+      NEXT_TELEMETRY_DISABLED: "1"
+    volumes:
+      - export_artifacts:/var/lib/716fm/export-artifacts
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - const net=require('node:net'); const s=net.createConnection({host:'127.0.0.1',port:3457},()=>{s.end();process.exit(0)}); s.setTimeout(3000,()=>{s.destroy();process.exit(1)}); s.on('error',()=>process.exit(1));
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  migrate:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    profiles:
+      - ops
+    command:
+      - npm
+      - run
+      - db:migrate
+    env_file:
+      - path: ./managed.env
+        required: false
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      EXPORT_ARTIFACTS_DIR: /var/lib/716fm/export-artifacts
+    volumes:
+      - export_artifacts:/var/lib/716fm/export-artifacts
+    restart: "no"
+
+volumes:
+  caddy_config:
+  caddy_data:
+  export_artifacts:

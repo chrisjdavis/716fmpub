@@ -1,0 +1,32 @@
+{
+  "name": "@vs/env",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./abuse-env-fields": {
+      "types": "./src/abuse-env-fields.ts",
+      "default": "./src/abuse-env-fields.ts"
+    },
+    "./deploy-env": {
+      "types": "./src/deploy-env.ts",
+      "default": "./src/deploy-env.ts"
+    }
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@vs/domain": "*",
+    "@vs/feature-flags": "*",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  }
+}

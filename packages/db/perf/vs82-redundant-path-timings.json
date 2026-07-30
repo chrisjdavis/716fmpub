@@ -1,0 +1,19 @@
+{
+  "issue": "VS-82",
+  "environment": "PGlite, 4000 listens, single track (median of 11 runs)",
+  "recordedAt": "2026-04-16T15:12:41.635Z",
+  "measurement_contract": {
+    "intent": "Regression harness for two hot server paths after VS-82 consolidation.",
+    "not_claimed": "Fingerprint SQL dedupe removes duplicate source code, not an extra round-trip per API call; expect similar median_ms to pre-change for that query alone.",
+    "compare_to": "packages/db/perf/vs82-redundant-path-timings.json on the same host class when changing dashboard archive reads or fingerprint aggregates."
+  },
+  "median_ms": {
+    "listen_fingerprint_aggregate_for_user": 1.4332080000001497,
+    "archive_listens_first_viewport_page": 20.540707999999995
+  },
+  "notes": [
+    "listen_fingerprint_aggregate_for_user is the single shared SQL path used by dashboard recompute and live listen fingerprint reads.",
+    "archive_listens_first_viewport_page maps each row through shared pg timestamptz coercion (server-side contract for played_at).",
+    "Full audit backlog and scope framing: docs/performance/vs-82-duplication-audit-inventory.md."
+  ]
+}

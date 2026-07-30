@@ -1,0 +1,14 @@
+title = "716fm"
+
+[extend]
+useDefault = true
+
+# Synthetic credentials and JWT-shaped strings used only in automated tests.
+# Production secrets must never be allowlisted here; add new test paths only with review.
+[allowlist]
+description = "Vetted Vitest fixtures (deterministic non-production material)"
+paths = [
+  '''apps/web/src/app/api/auth/recovery/confirm/route.test.ts''',
+  '''apps/web/src/server/api/auth-account-input-schemas.test.ts''',
+  '''packages/sensitive/src/log-redaction.test.ts''',
+]

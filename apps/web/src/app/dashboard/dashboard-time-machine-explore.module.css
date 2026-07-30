@@ -1,0 +1,477 @@
+/**
+ * Explore / time machine — soft entrance + tactile cards (mirrors conversational-home rhythm).
+ */
+
+.canvas {
+  /* Matches former cards → narrative: `gap-10` + `.exploreLowerAfterCards` (32px). */
+  --explore-section-gap: calc(2.5rem + 2rem);
+}
+
+@media (min-width: 768px) {
+  .canvas {
+    --explore-section-gap: calc(2.75rem + 2rem);
+  }
+}
+
+.canvasStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--explore-section-gap);
+}
+
+/* Tighter step from scrubber caption → month header (half of main section rhythm). */
+.timelineAndPeriod {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--explore-section-gap) * 0.5);
+  width: 100%;
+  min-width: 0;
+}
+
+.bodyAfterTimeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--explore-section-gap);
+  width: 100%;
+  min-width: 0;
+}
+
+.periodStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--explore-section-gap);
+  width: 100%;
+  min-width: 0;
+}
+
+/* Related lines + blocks (title/stats, headline/cards): original `space-y-4` rhythm, not section breaks. */
+.periodTightStack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .periodTightStack {
+    gap: 1.125rem;
+  }
+}
+
+/* Summary (24px) → anchor strip → cards (32px) — fluid, not comp-fixed Y. */
+.summaryAnchorCardsFlow {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.anchorStrip {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .anchorStrip {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+  }
+}
+
+.anchorStripLabelBlock {
+  flex-shrink: 0;
+  width: 100%;
+  /* Was 132px (spec); +25% for label breathing room beside the cover row. */
+  max-width: 165px;
+}
+
+@media (max-width: 767px) {
+  .anchorStripLabelBlock {
+    max-width: none;
+  }
+}
+
+.anchorStripLabel {
+  margin: 0;
+  padding: 0;
+}
+
+.anchorStripSubtitle {
+  margin: 0.625rem 0 0;
+  max-width: 150px;
+}
+
+@media (max-width: 767px) {
+  .anchorStripSubtitle {
+    max-width: none;
+  }
+
+  .anchorStrip {
+    margin-top: 1.25rem;
+    margin-bottom: 1.75rem;
+  }
+}
+
+.anchorStripCovers {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+
+@media (min-width: 768px) {
+  .anchorStripCovers {
+    flex: 1 1 0;
+    gap: 12px;
+    justify-content: flex-start;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+
+.anchorStripItem {
+  flex-shrink: 0;
+}
+
+.anchorCoverButton,
+.anchorCoverStatic {
+  display: block;
+  border-radius: 4px;
+  overflow: hidden;
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 180ms ease,
+    opacity 180ms ease;
+}
+
+.anchorCoverButton {
+  cursor: pointer;
+}
+
+.anchorCoverButton:hover,
+.anchorCoverButton:focus-visible {
+  transform: scale(1.03);
+  filter: brightness(1.06);
+}
+
+.anchorCoverFrame {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgb(0 0 0 / 0.12);
+}
+
+@media (min-width: 768px) {
+  .anchorCoverFrame {
+    width: 72px;
+    height: 72px;
+  }
+}
+
+.anchorCoverPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 1px solid var(--border, rgb(255 255 255 / 0.12));
+  background: rgb(0 0 0 / 0.22);
+  color: rgb(148 148 158 / 0.95);
+}
+
+.anchorCoverPlaceholderPulse {
+  animation: anchor-cover-placeholder-breathe 1.35s ease-in-out infinite;
+}
+
+@keyframes anchor-cover-placeholder-breathe {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.anchorCoverPlaceholderFill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.anchorCoverImgLayer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 220ms ease;
+  z-index: 1;
+}
+
+.anchorCoverImgLayerVisible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anchorCoverImgLayer {
+    transition: none;
+  }
+
+  .anchorCoverPlaceholderPulse {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+.anchorCoverPlaceholderGlyph {
+  flex-shrink: 0;
+  width: 1.375rem;
+  height: 1.375rem;
+  opacity: 0.85;
+}
+
+@media (min-width: 768px) {
+  .anchorCoverPlaceholderGlyph {
+    width: 1.625rem;
+    height: 1.625rem;
+  }
+}
+
+.moduleCardWithArt {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.moduleCardArt {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  margin-top: 2px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+@media (min-width: 768px) {
+  .moduleCardArt {
+    width: 56px;
+    height: 56px;
+    margin-top: 0;
+  }
+}
+
+.moduleCardTextCol {
+  min-width: 0;
+  flex: 1;
+}
+
+.canvas > * {
+  animation: explore-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.canvas > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.canvas > *:nth-child(2) {
+  animation-delay: 40ms;
+}
+.canvas > *:nth-child(3) {
+  animation-delay: 80ms;
+}
+.canvas > *:nth-child(4) {
+  animation-delay: 120ms;
+}
+.canvas > *:nth-child(5) {
+  animation-delay: 160ms;
+}
+.canvas > *:nth-child(6) {
+  animation-delay: 200ms;
+}
+.canvas > *:nth-child(7) {
+  animation-delay: 240ms;
+}
+
+@keyframes explore-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(0.35rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/**
+ * Month-scrubbed copy remounts (see `key={model.monthYyyMm}`) so enter motion re-runs
+ * instead of text swapping in place.
+ */
+.bodyAfterTimeline > * {
+  animation: explore-fade-up 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.bodyAfterTimeline > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.bodyAfterTimeline > *:nth-child(2) {
+  animation-delay: 45ms;
+}
+
+.bodyAfterTimeline > *:nth-child(3) {
+  animation-delay: 90ms;
+}
+
+.bodyAfterTimeline > *:nth-child(4) {
+  animation-delay: 135ms;
+}
+
+.periodHeaderRow {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Narrative stack: tight paragraph rhythm (not the same as section breaks above). */
+.exploreLower {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.contextStrip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.explorePrimaryNarrative {
+  margin-bottom: 0;
+}
+
+.exploreComparisonNarrative {
+  margin-top: 0;
+}
+
+.exploreContinuityNarrative {
+  margin-top: 0;
+}
+
+.exploreDetails {
+  margin-top: 0;
+  max-width: none;
+}
+
+.exploreDetails summary {
+  list-style: none;
+}
+
+.exploreDetails summary::-webkit-details-marker {
+  display: none;
+}
+
+.moduleCard {
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease,
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 200ms ease;
+}
+
+.moduleCard:hover {
+  border-color: rgb(var(--brand-rgb) / 0.45);
+  background: rgb(var(--brand-rgb) / 0.05);
+  transform: translateY(-1px);
+  box-shadow:
+    0 5px 18px rgb(0 0 0 / 0.1),
+    0 1px 6px rgb(var(--brand-rgb) / 0.12);
+}
+
+.archiveCta {
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.archiveCta:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 5px 20px rgb(0 0 0 / 0.12),
+    0 2px 10px rgb(var(--brand-rgb) / 0.22);
+  border-color: rgb(var(--brand-rgb) / 0.88);
+}
+
+.archiveCta:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.archiveCta:focus-visible {
+  outline: 2px solid rgb(var(--brand-rgb) / 0.55);
+  outline-offset: 3px;
+}
+
+/* New Music explore — archive CTA matches timeline blue (see scrubber / density). */
+.archiveCtaNewMusic:hover {
+  box-shadow:
+    0 5px 20px rgb(0 0 0 / 0.12),
+    0 2px 10px rgb(37 99 235 / 0.32);
+  border-color: rgb(37 99 235 / 0.92);
+}
+
+.archiveCtaNewMusic:focus-visible {
+  outline: 2px solid rgb(37 99 235 / 0.55);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .canvas > * {
+    animation: none;
+  }
+
+  .bodyAfterTimeline > * {
+    animation: none;
+  }
+
+  .moduleCard:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .archiveCta:hover,
+  .archiveCta:active {
+    transform: none;
+    box-shadow: none;
+  }
+}

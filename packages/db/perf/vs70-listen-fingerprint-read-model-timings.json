@@ -1,0 +1,13 @@
+{
+  "issue": "VS-70",
+  "environment": "PGlite, 4000 listens, single track (median of 11 runs)",
+  "recordedAt": "2026-04-16T13:32:43.819Z",
+  "median_ms": {
+    "legacy_listen_fingerprint_aggregate": 0.879917000000205,
+    "listen_fingerprint_v1_snapshot_select_plus_stale_exists": 0.4415830000000369
+  },
+  "notes": [
+    "legacy path matches the pre-VS-70 single statement (max + count) used on every poll.",
+    "snapshot path matches production freshness: read JSON row + exists(listens.played_at > as_of)."
+  ]
+}

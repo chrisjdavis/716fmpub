@@ -1,0 +1,23 @@
+{
+	email {$ACME_EMAIL}
+}
+
+{$APP_DOMAIN} {
+	encode zstd gzip
+	handle /api/me/listen-realtime {
+		reverse_proxy web:3000
+	}
+
+	@websocket {
+		header Connection *Upgrade*
+		header Upgrade websocket
+	}
+
+	handle @websocket {
+		reverse_proxy realtime:3457
+	}
+
+	handle {
+		reverse_proxy web:3000
+	}
+}

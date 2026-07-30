@@ -1,0 +1,14 @@
+{
+  "issue": "VS-69",
+  "environment": "PGlite, 4000 listens, single track (median of 11 runs)",
+  "recordedAt": "2026-04-16T13:24:21.434Z",
+  "median_ms": {
+    "before_reference_full_dashboard_listen_summary_all": 52.57425000000012,
+    "after_archive_page_header_queries": 20.769207999999935,
+    "after_archive_keyset_page_first_viewport": 14.795333000000028
+  },
+  "notes": [
+    "before_reference_full_dashboard_listen_summary_all is the legacy archive fallback cost (four parallel aggregate statements).",
+    "after_archive_page_header_queries is the replacement path used by loadArchivePageData when no fresh dashboard_bundle_v1 exists."
+  ]
+}

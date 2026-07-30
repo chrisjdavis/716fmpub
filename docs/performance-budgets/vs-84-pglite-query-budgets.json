@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "ticket": "VS-84",
+  "contract": "PGlite is slower and less representative than production Postgres; this budget catches catastrophic SQL or ORM regressions on the imports list+count path only.",
+  "importJobsListWithTotalCount": {
+    "fixtureRowCount": 250,
+    "warmupIterations": 1,
+    "timedIterations": 3,
+    "maxMedianWallMsPgLite": 900
+  }
+}

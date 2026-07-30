@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Gitleaks calls the PR commits API; without pull-requests:read the token gets 403 (gitleaks#1343).
+permissions:
+  contents: read
+  pull-requests: read
+
+# Security job thresholds (documented in README.md — CI security scanning).
+env:
+  VS_NPM_AUDIT_LEVEL: moderate
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s
+          --health-timeout 2s
+          --health-retries 30
+    env:
+      REDIS_URL: redis://127.0.0.1:6379
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      # Includes `apps/web/src/server/api/security-regression/**` (auth, CSRF, cross-account, destructive flows).
+      - run: npm test
+      - name: Performance budgets (Next production build + First Load JS ceilings)
+        run: npm run perf:check:budgets -w web
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Dependency vulnerability scan (npm audit)
+        run: npm audit --audit-level=${{ env.VS_NPM_AUDIT_LEVEL }}

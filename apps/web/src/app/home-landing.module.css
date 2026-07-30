@@ -1,0 +1,1187 @@
+.page {
+  min-height: 100vh;
+  /* Slight lift from flat #000: warm air above the canvas (still reads as 716FM dark). */
+  background:
+    radial-gradient(125% 60% at 50% -5%, oklch(0.22 0.045 55 / 0.2) 0%, transparent 52%),
+    var(--black);
+  color: var(--text-primary);
+  scroll-behavior: smooth;
+}
+
+.page :where(h1, h2, h3) {
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+/* Explore marketing preview: match dashboard Explore (Doto display + Figtree body + mono data). */
+.page [data-home-explore-preview] :where(h1, h2, h3) {
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+
+/*
+ * Match dashboard shell geometry: outer `px-6`, inner `mx-auto max-w-app-content`
+ * (`apps/web/src/app/dashboard/layout.tsx`). Padding must sit *outside* the max-width
+ * cap — a single box with both shrinks content vs the app header.
+ */
+.shellOuter {
+  width: 100%;
+  box-sizing: border-box;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.shellInner {
+  width: 100%;
+  max-width: var(--app-content-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  min-width: 0;
+}
+
+.topbar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.brandLine {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  border-radius: 0.25rem;
+}
+
+.page .brandLine:focus-visible {
+  outline: 2px solid rgb(var(--brand-rgb));
+  outline-offset: 3px;
+}
+
+.brandName {
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: clamp(0.9375rem, 0.85rem + 0.35vw, 1.125rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.topbarActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.topbarLinkButton {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.topbarLinkButton:hover,
+.topbarLinkButton:focus-visible {
+  color: var(--text-display);
+  text-decoration: underline;
+}
+
+.buttonRow {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0.375rem 0.875rem;
+  border: 0;
+  border-radius: 999px;
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    color 180ms cubic-bezier(0.25, 0.1, 0.25, 1),
+    border-color 180ms cubic-bezier(0.25, 0.1, 0.25, 1),
+    background-color 180ms cubic-bezier(0.25, 0.1, 0.25, 1),
+    opacity 180ms cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.page a.button {
+  text-decoration: none;
+}
+
+.page a.button.buttonPrimary {
+  color: #000000;
+}
+
+.page a.button.buttonPrimary:hover,
+.page a.button.buttonPrimary:focus-visible {
+  opacity: 0.92;
+}
+
+.page a.button.buttonSecondary {
+  color: var(--text-primary);
+}
+
+.buttonPrimary {
+  background: #ffffff;
+  color: #000000;
+}
+
+.buttonPrimary:hover,
+.buttonPrimary:focus-visible {
+  opacity: 0.92;
+}
+
+.buttonSecondary {
+  border: 1px solid var(--border-visible);
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.buttonSecondary:hover,
+.buttonSecondary:focus-visible {
+  border-color: var(--text-display);
+  color: var(--text-display);
+}
+
+.landingMain {
+  padding-top: 2.5rem;
+  padding-bottom: 4rem;
+}
+
+.heroCentered {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+  padding-bottom: 3.5rem;
+}
+
+.heroCopyBlock {
+  width: 100%;
+  max-width: min(63rem, 92vw);
+  text-align: center;
+}
+
+.label {
+  display: inline-block;
+  margin: 0;
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.heroHeadline {
+  margin: 0.75rem 0 0;
+  font-weight: 500;
+  font-size: clamp(2.75rem, 7vw, 5.25rem);
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+  color: var(--text-display);
+}
+
+.bodyCopy {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+
+.heroCopy {
+  margin-top: 1rem;
+}
+
+.sectionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: calc(3rem * 1.4);
+  row-gap: 2rem;
+  padding-top: 3rem;
+}
+
+.sectionGridLanding {
+  padding-top: 0;
+}
+
+.sectionBlock {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  font-weight: 500;
+  color: var(--text-display);
+}
+
+.surface {
+  background: var(--surface);
+}
+
+.technicalSurface {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.statList {
+  display: grid;
+}
+
+.statRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding-top: 0.875rem;
+  padding-bottom: 0.875rem;
+  border-top: 1px solid var(--border);
+}
+
+.statRow:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.statLabel {
+  color: var(--text-secondary);
+}
+
+.statValue {
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 1rem;
+  color: var(--text-display);
+  text-align: right;
+}
+
+.leadingStatSurface {
+  display: grid;
+  gap: 1rem;
+}
+
+.queueSignalInCard {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: end;
+  text-align: right;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.queueSignalLabel {
+  margin: 0;
+}
+
+.displayNumberInSection {
+  margin: 0;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(3rem, 8vw, 5rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--text-display);
+}
+
+.queueSignalEdgeLabel {
+  margin: 0;
+  max-width: 18rem;
+}
+
+.listSurface {
+  display: grid;
+}
+
+.dataRow {
+  display: grid;
+  gap: 0.75rem;
+  align-items: center;
+  padding-top: 0.875rem;
+  padding-bottom: 0.875rem;
+  border-top: 1px solid var(--border);
+}
+
+.dataRow:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.processRow {
+  grid-template-columns: auto 1fr;
+}
+
+.rowIndex {
+  min-width: 2rem;
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-disabled);
+}
+
+.rowTitle {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text-display);
+}
+
+.rowCopy {
+  margin: 0.25rem 0 0;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.statusRow {
+  grid-template-columns: 120px 1fr;
+}
+
+.progressCluster {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.segmentedBar {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 2px;
+}
+
+.segment {
+  height: 10px;
+  background: var(--border);
+}
+
+.segmentInfo {
+  background: var(--text-secondary);
+}
+
+.segmentSuccess {
+  background: var(--success);
+}
+
+.segmentAccent {
+  background: var(--accent);
+}
+
+/**
+ * Indeterminate Nothing-style segmented bar (staggered pulse while totals are unknown).
+ */
+@keyframes nothingSegmentedWait {
+  0%,
+  100% {
+    opacity: 0.28;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.segmentWaitPulse {
+  animation: nothingSegmentedWait 1.2s ease-in-out infinite;
+}
+
+.statusValue {
+  margin: 0;
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+}
+
+.accent {
+  color: var(--accent);
+}
+
+.success {
+  color: var(--success);
+}
+
+.info {
+  color: var(--text-secondary);
+}
+
+.dashboardPreviewBlock {
+  padding: 0;
+}
+
+.previewFrame {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.previewHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.previewPrimary {
+  margin: 0;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(2.75rem, 6vw, 4.25rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--text-display);
+}
+
+.previewSubgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.previewList {
+  display: grid;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+@media (max-width: 900px) {
+  .topbar {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .sectionGrid,
+  .previewSubgrid {
+    grid-template-columns: 1fr;
+  }
+
+  .queueSignalInCard,
+  .queueSignalEdgeLabel {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .statusRow,
+  .processRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* —— UX spec (Nothing-style): landing —— */
+.specTopbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+
+.specTopbarActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1.25rem;
+}
+
+/* Type matches dashboard rail: `font-mono text-caption` + `leading-none` (tailwind.config.ts). */
+.specTopLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  box-sizing: border-box;
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.75rem;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.specTopLink:hover {
+  color: var(--text-display);
+  text-decoration: underline;
+}
+
+.specTopLink:focus-visible {
+  color: var(--text-display);
+  outline: 2px solid rgb(var(--brand-rgb));
+  outline-offset: 3px;
+  border-radius: 0.25rem;
+  text-decoration: none;
+}
+
+.specTopLinkButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.75rem;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.specTopLinkButton:hover,
+.specTopLinkButton:focus-visible {
+  color: var(--text-display);
+  text-decoration: underline;
+}
+
+.specMain {
+  padding-top: clamp(2.5rem, 6vw, 4rem);
+  padding-bottom: clamp(3rem, 10vw, 6rem);
+}
+
+/* Hero + stacked body sections (single column) */
+.specLayoutGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: start;
+  text-align: left;
+}
+
+.specHeroSection {
+  grid-column: 1;
+  grid-row: 1;
+  margin-bottom: 0;
+}
+
+.specSectionsWrap {
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.75rem, 5vw, 4.5rem);
+  min-width: 0;
+}
+
+.specHeroLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.75rem;
+  width: 100%;
+  min-width: 0;
+  /* Let the grid column set width; avoid capping the headline below the column */
+  max-width: none;
+}
+
+.specHeadline {
+  margin: 0;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 500;
+  /* Slightly lower vw min so one line holds at laptop widths once the column is wider */
+  font-size: clamp(2rem, 4.25vw + 1rem, 3.75rem);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--text-display);
+  max-width: 100%;
+}
+
+/* Hero headline: sentence case reads calmer for first-timers; keeps display weight. */
+.specHeadlineSentence {
+  text-transform: none;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+@media (max-width: 480px) {
+  .specHeadlineSentence {
+    letter-spacing: -0.025em;
+  }
+}
+
+.specSub {
+  margin: 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  max-width: 65ch;
+  color: var(--text-primary);
+}
+
+.specCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 2.75rem;
+  padding: 0.65rem 1.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border-visible);
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-display);
+  text-decoration: none;
+  background: transparent;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.12s ease,
+    transform 0.12s ease;
+}
+
+.specCta:hover,
+.specCta:focus-visible {
+  background-color: var(--surface-raised);
+  border-color: var(--text-display);
+}
+
+.specCta:focus-visible {
+  outline: 2px solid rgb(var(--brand-rgb));
+  outline-offset: 2px;
+}
+
+.specCta:active {
+  opacity: 0.9;
+  transform: translateY(0.5px);
+}
+
+.specHeroActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.75rem 1rem;
+  margin-top: 0.25rem;
+}
+
+.specCtaSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 2.75rem;
+  padding: 0.65rem 1.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border);
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-decoration: none;
+  background: transparent;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.12s ease,
+    transform 0.12s ease;
+}
+
+.specCtaSecondary:hover,
+.specCtaSecondary:focus-visible {
+  color: var(--text-display);
+  border-color: var(--border-visible);
+  background-color: var(--surface-raised);
+}
+
+.specCtaSecondary:focus-visible {
+  outline: 2px solid rgb(var(--brand-rgb));
+  outline-offset: 2px;
+}
+
+.specCtaSecondary:active {
+  opacity: 0.9;
+  transform: translateY(0.5px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .specCta:active,
+  .specCtaSecondary:active {
+    transform: none;
+  }
+}
+
+/* globals.css `a:hover` underlines links — these are button-styled anchors. */
+.page .specCta:hover,
+.page .specCta:focus-visible,
+.page .specCtaSecondary:hover,
+.page .specCtaSecondary:focus-visible {
+  text-decoration: none;
+}
+
+.specSection {
+  padding-top: clamp(2rem, 4vw, 3rem);
+  width: 100%;
+  max-width: none;
+  text-align: left;
+}
+
+.specSectionTitle {
+  margin: 0 0 1rem;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: clamp(1.35rem, 2.8vw, 1.85rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text-display);
+}
+
+.specSectionLead {
+  margin: 0 0 1.5rem;
+  max-width: 65ch;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.specSectionBody {
+  margin: 0 0 1rem;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.specSectionBody:last-of-type {
+  margin-bottom: 0;
+}
+
+.specMidCtaBand {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  margin: 0;
+  padding: clamp(1.25rem, 3vw, 1.75rem) clamp(1rem, 2.5vw, 1.5rem);
+  box-sizing: border-box;
+  border: 1px solid var(--border-visible);
+  border-radius: 0.375rem;
+  background: var(--surface);
+}
+
+.specMidCtaBandCopy {
+  margin: 0;
+  flex: 1 1 12rem;
+  min-width: 0;
+  max-width: 42ch;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.specMidCtaBandActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.specPreviewDetails {
+  margin: 0 0 1.25rem;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  padding: 0.65rem 1rem 0.85rem;
+  background: var(--surface);
+}
+
+.specPreviewDetailsSummary {
+  cursor: pointer;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  list-style: none;
+  border-radius: 0.25rem;
+}
+
+.specPreviewDetailsSummary:focus-visible {
+  outline: 2px solid rgb(var(--brand-rgb));
+  outline-offset: 2px;
+}
+
+.specPreviewDetailsSummary::-webkit-details-marker {
+  display: none;
+}
+
+.specPreviewDetailsSummary::before {
+  content: "+";
+  flex-shrink: 0;
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.specPreviewDetails[open] .specPreviewDetailsSummary {
+  color: var(--text-display);
+  margin-bottom: 0.5rem;
+}
+
+.specPreviewDetails[open] .specPreviewDetailsSummary::before {
+  content: "−";
+}
+
+.specPreviewDetailsBody {
+  margin: 0;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+
+.specSteps {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.specStep {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem 1.25rem;
+  align-items: start;
+}
+
+.specStepIndex {
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  padding-top: 0.15rem;
+}
+
+.specStepTitle {
+  margin: 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+.specPreviewLabel {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.specOwnershipGrid {
+  list-style: none;
+  margin: clamp(1.5rem, 4vw, 2.25rem) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+}
+
+@media (min-width: 720px) {
+  .specOwnershipGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+}
+
+.specOwnershipBox {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  min-height: 100%;
+  padding: 1.2rem 1.25rem 1.35rem;
+  box-sizing: border-box;
+  border: 1px solid var(--border-visible);
+  border-radius: 0.375rem;
+  background: var(--surface);
+  /* Top accent reads as “stamp” / ledger tab — avoids thick side-rail card trope */
+  box-shadow: inset 0 2px 0 0 rgb(var(--brand-rgb) / 0.55);
+}
+
+.specOwnershipKicker {
+  margin: 0;
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.625rem;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.specOwnershipTitle {
+  margin: 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--text-display);
+}
+
+.specOwnershipMeta {
+  margin: 0;
+  padding-top: 0.15rem;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.specPricingGrid {
+  margin-top: clamp(1.5rem, 4vw, 2.25rem);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+@media (min-width: 720px) {
+  .specPricingGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.25rem;
+  }
+}
+
+.specPricingCard {
+  margin-top: 0;
+  overflow: hidden;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  border: 1px solid var(--border-visible);
+  border-radius: 0.375rem;
+  background: var(--surface);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.specPricingCardCore {
+  border-color: rgb(var(--brand-rgb) / 0.58);
+}
+
+.specPricingHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.specPricingPlan {
+  margin: 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 1.125rem;
+  color: var(--text-display);
+}
+
+.specPricingAmount {
+  margin: 0;
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.875rem;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+}
+
+.specPricingIncludes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.specPricingIncludes li {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--border);
+}
+
+/* Pin CTAs to the card footer so paired columns stay baseline-aligned. */
+.specPricingCard :is(.specCta, .specCtaSecondary) {
+  margin-top: auto;
+  align-self: stretch;
+  text-align: center;
+}
+
+.specFooter {
+  margin-top: clamp(2rem, 5vw, 3.5rem);
+  padding-top: clamp(1.75rem, 4vw, 2.5rem);
+  padding-bottom: clamp(2rem, 5vw, 3rem);
+  border-top: 1px solid var(--border);
+}
+
+.specFooterInner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+}
+
+.specFooterNav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+}
+
+.specFooterLink {
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.specFooterLink:hover,
+.specFooterLink:focus-visible {
+  color: var(--text-display);
+  text-decoration: underline;
+}
+
+.specFooterLink:focus-visible {
+  outline: 2px solid rgb(var(--brand-rgb));
+  outline-offset: 3px;
+  border-radius: 0.25rem;
+  text-decoration: none;
+}
+
+.specFooterMeta {
+  margin: 0;
+  font-family: var(--font-data), ui-monospace, monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* —— Scroll-native editorial (progressive enhancement) —— */
+@keyframes landing-scroll-read-line {
+  from {
+    transform: scaleY(0);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.scrollReadLine {
+  display: none;
+}
+
+/* IO-driven reveals (see `home-landing-scroll-reveal.tsx`); `view()` was not visible with this layout. */
+@media (prefers-reduced-motion: no-preference) {
+  .page[data-landing-reveal-live="yes"] [data-landing-reveal] {
+    transition:
+      opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .page[data-landing-reveal-live="yes"] [data-landing-reveal].landingRevealPending {
+    opacity: 0;
+    transform: translate3d(0, 0.75rem, 0);
+  }
+
+  .page[data-landing-reveal-live="yes"] [data-landing-reveal].landingRevealOn {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /*
+   * First paint with `.landingRevealOn` (above-the-fold): animate from the same off-state as
+   * `.landingRevealPending` without a prior “hide everything” frame (avoids load flicker).
+   */
+  @starting-style {
+    .page[data-landing-reveal-live="yes"] [data-landing-reveal].landingRevealOn {
+      opacity: 0;
+      transform: translate3d(0, 0.75rem, 0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll(root block)) {
+    .scrollReadLine {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: max(0px, env(safe-area-inset-left));
+      width: 2px;
+      height: 100dvh;
+      z-index: 30;
+      pointer-events: none;
+      background: rgb(var(--brand-rgb));
+      opacity: 0.55;
+      transform-origin: top center;
+      transform: scaleY(0);
+      animation-name: landing-scroll-read-line;
+      animation-duration: 1ms;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}

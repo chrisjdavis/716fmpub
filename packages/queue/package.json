@@ -1,0 +1,32 @@
+{
+  "name": "@vs/queue",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./operator-inspection": {
+      "types": "./src/queue-inspection.ts",
+      "default": "./src/queue-inspection.ts"
+    }
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@vs/sensitive": "*",
+    "@vs/env": "*",
+    "bullmq": "^5.41.5",
+    "ioredis": "^5.6.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  }
+}

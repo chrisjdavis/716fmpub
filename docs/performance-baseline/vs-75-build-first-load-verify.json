@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "ticket": "VS-75",
+  "recordedAt": "2026-04-16T14:16:32Z",
+  "npmCommand": "npm run build -w web",
+  "nextVersion": "15.5.15",
+  "firstLoadJsKb": {
+    "shared": 102,
+    "middlewareKb": 49.5,
+    "routes": {
+      "/": 109,
+      "/dashboard": 124,
+      "/dashboard/archive": 116,
+      "/dashboard/export": 107,
+      "/dashboard/imports": 122,
+      "/dashboard/settings": 109
+    }
+  },
+  "baselineComparison": {
+    "priorArtifact": "docs/performance-baseline/recorded-2026-04-16-local.json",
+    "priorArtifactField": "nextBuildFirstLoadJsKb.routes",
+    "priorArtifactGitSha": "5647d36db21edde84f7798845a85d1352fb790f9",
+    "routesComparedEqualAtRoundedKb": [
+      "/",
+      "/dashboard",
+      "/dashboard/archive",
+      "/dashboard/export",
+      "/dashboard/imports",
+      "/dashboard/settings"
+    ],
+    "note": "First Load JS matches the prior recorded snapshot at 1 kB resolution (no regression in bundle table). VS-75 additionally removes an unnecessary client boundary on the analytics range control and fixes production build compatibility for deferred telemetry (see nextConstraintsNote)."
+  },
+  "nextConstraintsNote": "As of Next.js 15.5, `next/dynamic` with `{ ssr: false }` cannot be used directly inside Server Components. Optional shell telemetry when profiling is off uses `apps/web/src/components/deferred-client-perf-telemetry.tsx` (Client Component wrapper). When `NEXT_PUBLIC_VS_CLIENT_PERF=1`, the dashboard layout renders `ClientPerfTelemetry` synchronously so Web Vitals timing stays comparable."
+}

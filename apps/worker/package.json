@@ -1,0 +1,35 @@
+{
+  "name": "worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "enqueue:smoke-test": "tsx scripts/enqueue-smoke-test-job.ts",
+    "enqueue:layer1-recompute": "tsx scripts/enqueue-layer1-recompute.ts",
+    "inspect:bullmq-queues": "tsx scripts/inspect-bullmq-queues.ts",
+    "inspect:stalled-db-jobs": "tsx scripts/inspect-stalled-db-jobs.ts",
+    "start": "tsx src/index.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@vs/sensitive": "*",
+    "@vs/db": "*",
+    "@vs/domain": "*",
+    "@vs/env": "*",
+    "@vs/lastfm-provider": "*",
+    "@vs/queue": "*",
+    "archiver": "^7.0.1",
+    "bullmq": "^5.41.5",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.4.4",
+    "@types/archiver": "^7.0.0",
+    "@types/pg": "^8.11.10",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^3.2.4"
+  }
+}

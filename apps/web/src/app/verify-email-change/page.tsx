@@ -1,0 +1,64 @@
+import Link from "next/link";
+import {
+  signupAccessMainClassName,
+  signupAccessPageHeaderClassName,
+  signupAuthPageStackClassName,
+  signupFormShellClassName,
+} from "@/app/access-layout";
+import { VerifyEmailChangeClient } from "./verify-email-change-client";
+
+export default async function VerifyEmailChangePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ token?: string }>;
+}) {
+  const { token: raw } = await searchParams;
+  const token = typeof raw === "string" ? raw.trim() : "";
+
+  return (
+    <main className={signupAccessMainClassName}>
+      <div className={signupAuthPageStackClassName}>
+        <header className={signupAccessPageHeaderClassName}>
+          <div className="space-y-3">
+            <p className="font-mono text-label uppercase tracking-[0.08em] text-overline">Account</p>
+            <h1 className="font-display text-display-md text-display">Confirm new email</h1>
+          </div>
+          <nav className="font-mono text-caption uppercase tracking-[0.06em] text-muted">
+            <Link href="/" className="text-interactive no-underline hover:underline">
+              Home
+            </Link>
+            <span className="mx-2 text-faint">/</span>
+            <Link href="/login" className="text-interactive no-underline hover:underline">
+              Sign in
+            </Link>
+          </nav>
+        </header>
+        {token.length >= 32 ? (
+          <VerifyEmailChangeClient token={token} />
+        ) : (
+          <div className={signupFormShellClassName}>
+            <div className="space-y-4">
+              <p className="font-display text-display-md text-display">Confirmation link incomplete</p>
+              <p className="font-sans text-body text-foreground">
+                Open the full address from your email change message, including everything after{" "}
+                <span className="font-mono text-body-sm text-muted">token=</span>. If you already
+                confirmed the change, sign in and continue from the dashboard.
+              </p>
+            </div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
+              <Link href="/login" className="vs-btn-primary">
+                Sign in
+              </Link>
+              <Link
+                href="/"
+                className="font-mono text-label uppercase tracking-[0.08em] text-interactive no-underline hover:underline"
+              >
+                Home
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}

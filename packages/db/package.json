@@ -1,0 +1,54 @@
+{
+  "name": "@vs/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./test/pgliteHarness": {
+      "types": "./src/test/pgliteHarness.ts",
+      "default": "./src/test/pgliteHarness.ts"
+    },
+    "./test/signalValidationListenSeeds": {
+      "types": "./src/test/signalValidationListenSeeds.ts",
+      "default": "./src/test/signalValidationListenSeeds.ts"
+    }
+  },
+  "scripts": {
+    "migrate": "node-pg-migrate up",
+    "migrate:down": "node-pg-migrate down",
+    "validate": "tsx src/validateConnection.ts",
+    "bootstrap:account-role": "tsx scripts/bootstrap-account-role-from-env.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "bench:vs69": "tsx scripts/vs69-archive-query-timings.ts",
+    "bench:vs70": "tsx scripts/vs70-listen-fingerprint-read-model-timings.ts",
+    "bench:vs82": "tsx scripts/vs82-redundant-path-timings.ts",
+    "seed:signal-validation": "tsx scripts/seed-signal-validation-profiles.ts"
+  },
+  "node-pg-migrate": {
+    "migrations-table": "pgmigrations",
+    "dir": "migrations",
+    "create-schema": true
+  },
+  "dependencies": {
+    "@vs/sensitive": "*",
+    "@vs/domain": "*",
+    "@vs/env": "*",
+    "@vs/queue": "*",
+    "node-pg-migrate": "^8.0.4",
+    "path-scurry": "^2.0.2",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.4.4",
+    "@types/pg": "^8.11.10",
+    "bullmq": "^5.41.5",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.2.4"
+  }
+}
