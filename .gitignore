@@ -71,7 +71,6 @@ web_modules/
 .env
 .env.*
 !.env.example
-deploy/digitalocean/pilot.env
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

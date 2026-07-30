@@ -6,5 +6,4 @@ node_modules
 ._*
 **/._*
 npm-debug.log*
-deploy/digitalocean/pilot.env
 docs/performance-baseline

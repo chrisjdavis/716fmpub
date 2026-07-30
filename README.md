@@ -145,11 +145,6 @@ npm test                 # monorepo tests
 
 ## Production / VPS deploy
 
-For a single-Droplet Docker + Caddy stack, follow:
-
-- [docs/runbooks/digitalocean-pilot-deploy.md](./docs/runbooks/digitalocean-pilot-deploy.md)
-- Env templates: [`deploy/digitalocean/pilot.env.example`](./deploy/digitalocean/pilot.env.example), [`deploy/digitalocean/managed.env.example`](./deploy/digitalocean/managed.env.example)
-
 Checklist before exposing the app on the internet:
 
 1. Set `VS_DEPLOY_ENV` to `staging` or `production` as appropriate.
