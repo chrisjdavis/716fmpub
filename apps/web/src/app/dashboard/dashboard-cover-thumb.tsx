@@ -1,6 +1,7 @@
 "use client";
 
 import { coverArtArchiveFrontThumbnailUrl } from "@vs/domain/cover-art-archive-url";
+import { sanitizeRemoteCoverImageUrl } from "@vs/domain/import/lastfm-cover-image-url";
 import { useEffect, useMemo, useState } from "react";
 
 const thumbFrame =
@@ -54,14 +55,7 @@ function MissingAlbumArtIcon({ className }: Readonly<{ className?: string }>) {
 }
 
 function normalizeHttpUrl(raw: string | null | undefined): string | null {
-  if (raw === undefined || raw === null) {
-    return null;
-  }
-  const t = raw.trim();
-  if (t === "" || !/^https?:\/\//i.test(t)) {
-    return null;
-  }
-  return t;
+  return sanitizeRemoteCoverImageUrl(raw);
 }
 
 function coverCandidateUrls(

@@ -48,6 +48,10 @@
       "types": "./src/import/coverArtArchiveUrl.ts",
       "default": "./src/import/coverArtArchiveUrl.ts"
     },
+    "./import/lastfm-cover-image-url": {
+      "types": "./src/import/lastfmCoverImageUrl.ts",
+      "default": "./src/import/lastfmCoverImageUrl.ts"
+    },
     "./import/pipeline-stage": {
       "types": "./src/import/pipelineStage.ts",
       "default": "./src/import/pipelineStage.ts"

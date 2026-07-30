@@ -10,12 +10,24 @@ import {
 } from "./middleware.transport";
 
 const TRACE_HEADER = "x-vs-trace" as const;
+const NONCE_HEADER = "x-nonce" as const;
 
-function nextWithIncomingTrace(request: NextRequest): NextResponse {
+function newScriptNonce(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  let bin = "";
+  for (const b of bytes) {
+    bin += String.fromCharCode(b);
+  }
+  return btoa(bin);
+}
+
+function nextWithIncomingTrace(request: NextRequest, scriptNonce: string): NextResponse {
   const headers = new Headers(request.headers);
   if (!headers.get(TRACE_HEADER)?.trim()) {
     headers.set(TRACE_HEADER, crypto.randomUUID());
   }
+  headers.set(NONCE_HEADER, scriptNonce);
   return NextResponse.next({ request: { headers } });
 }
 
@@ -28,8 +40,9 @@ function nextWithIncomingTrace(request: NextRequest): NextResponse {
  */
 export function middleware(request: NextRequest): NextResponse {
   const ctx = readEdgeTransportContext(process.env as Record<string, string | undefined>);
+  const scriptNonce = newScriptNonce();
   const finish = (res: NextResponse): NextResponse =>
-    finalizeTransportSecurityHeaders(res, request, ctx);
+    finalizeTransportSecurityHeaders(res, request, ctx, scriptNonce);
 
   if (request.method !== "OPTIONS") {
     const transportBlock = transportInsecureResponse(request, ctx);
@@ -39,11 +52,11 @@ export function middleware(request: NextRequest): NextResponse {
   }
 
   if (request.method === "OPTIONS") {
-    return finish(nextWithIncomingTrace(request));
+    return finish(nextWithIncomingTrace(request, scriptNonce));
   }
 
   if (!request.nextUrl.pathname.startsWith("/api")) {
-    return finish(nextWithIncomingTrace(request));
+    return finish(nextWithIncomingTrace(request, scriptNonce));
   }
 
   const abuseEnv = parseAbuseEnvFields(
@@ -63,7 +76,7 @@ export function middleware(request: NextRequest): NextResponse {
   if (denied) {
     return finish(denied);
   }
-  return finish(nextWithIncomingTrace(request));
+  return finish(nextWithIncomingTrace(request, scriptNonce));
 }
 
 export const config = {

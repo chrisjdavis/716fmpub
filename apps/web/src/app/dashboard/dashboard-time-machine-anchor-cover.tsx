@@ -1,7 +1,8 @@
 "use client";
 
 import { CassetteTape } from "lucide-react";
-import { useLayoutEffect, useRef, useState } from "react";
+import { sanitizeRemoteCoverImageUrl } from "@vs/domain/import/lastfm-cover-image-url";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import styles from "./dashboard-time-machine-explore.module.css";
 
 export function DashboardTimeMachineAnchorCover({
@@ -11,6 +12,7 @@ export function DashboardTimeMachineAnchorCover({
   imageUrl: string | null | undefined;
   alt: string;
 }>) {
+  const safeUrl = useMemo(() => sanitizeRemoteCoverImageUrl(imageUrl), [imageUrl]);
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const imgRef = useRef<HTMLImageElement | null>(null);
@@ -20,7 +22,7 @@ export function DashboardTimeMachineAnchorCover({
     setLoaded(false);
     setFailed(false);
     const el = imgRef.current;
-    if (!el || !imageUrl?.trim()) {
+    if (!el || !safeUrl) {
       return;
     }
     if (el.complete) {
@@ -30,9 +32,9 @@ export function DashboardTimeMachineAnchorCover({
         setFailed(true);
       }
     }
-  }, [imageUrl]);
+  }, [safeUrl]);
 
-  const showRemote = Boolean(imageUrl?.trim()) && !failed;
+  const showRemote = Boolean(safeUrl) && !failed;
   const pulseWhileLoading = showRemote && !loaded;
 
   return (
@@ -49,11 +51,11 @@ export function DashboardTimeMachineAnchorCover({
           className={styles.anchorCoverPlaceholderGlyph}
         />
       </div>
-      {showRemote ? (
-        // eslint-disable-next-line @next/next/no-img-element -- remote Last.fm; no next/image allowlist for arbitrary CDN URLs.
+      {showRemote && safeUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element -- remote Last.fm CDN
         <img
           ref={imgRef}
-          src={imageUrl!}
+          src={safeUrl}
           alt={alt}
           onLoad={() => setLoaded(true)}
           onError={() => setFailed(true)}

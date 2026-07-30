@@ -6,6 +6,33 @@ const SIZE_RANK: Readonly<Record<string, number>> = {
   small: 4,
 };
 
+/**
+ * Allows only http(s) cover URLs suitable for `<img src>`. Rejects other schemes and
+ * malformed values that browsers might reinterpret.
+ */
+export function sanitizeRemoteCoverImageUrl(raw: string | null | undefined): string | null {
+  if (raw === undefined || raw === null) {
+    return null;
+  }
+  const t = raw.trim();
+  if (t === "" || /[\\\s\u0000-\u001f\u007f]/.test(t)) {
+    return null;
+  }
+  let parsed: URL;
+  try {
+    parsed = new URL(t);
+  } catch {
+    return null;
+  }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    return null;
+  }
+  if (!parsed.hostname) {
+    return null;
+  }
+  return parsed.href;
+}
+
 function collectImageCandidates(imageField: unknown, out: { url: string; rank: number }[]): void {
   const list = Array.isArray(imageField)
     ? imageField
@@ -24,12 +51,13 @@ function collectImageCandidates(imageField: unknown, out: { url: string; rank: n
         : typeof o.url === "string"
           ? o.url.trim()
           : "";
-    if (text === "" || !/^https?:\/\//i.test(text)) {
+    const safe = sanitizeRemoteCoverImageUrl(text);
+    if (!safe) {
       continue;
     }
     const size = typeof o.size === "string" ? o.size.toLowerCase() : "";
     const rank = SIZE_RANK[size] ?? 5;
-    out.push({ url: text, rank });
+    out.push({ url: safe, rank });
   }
 }
 

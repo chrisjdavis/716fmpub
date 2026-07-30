@@ -74,11 +74,17 @@ export async function GET(
     }
 
     const url = new URL(req.url);
-    const rawToken = url.searchParams.get("token");
+    const auth = req.headers.get("authorization");
+    const bearer =
+      auth && /^Bearer\s+(\S+)/i.test(auth.trim())
+        ? /^Bearer\s+(\S+)/i.exec(auth.trim())?.[1] ?? null
+        : null;
+    const rawToken = bearer ?? url.searchParams.get("token");
     if (rawToken === null || rawToken.trim() === "") {
       return NextResponse.json(
         {
-          error: "A download token is required. Open the export status page and use the provided download link.",
+          error:
+            "A download token is required. Open the export status page and use the provided download action.",
           code: "export_download_token_required",
         },
         { status: 400, headers: EXPORT_LISTEN_NO_REFERRER_HEADERS },

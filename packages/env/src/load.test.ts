@@ -605,6 +605,7 @@ describe("strict staging and production deploy rules", () => {
       FEATURE_FLAGS: "{}",
       VS_TRUST_PROXY_HEADERS: "true",
       VS_PUBLIC_APP_ORIGIN: "https://app.example.com",
+      VS_SETUP_BOOTSTRAP_SECRET: "b".repeat(32),
       ...overrides,
     };
   }
@@ -732,6 +733,27 @@ describe("strict staging and production deploy rules", () => {
       ...strictBase({ VS_INTERNAL_API_SECRET: "z".repeat(32) }),
     });
     expect(env.VS_INTERNAL_API_SECRET).toHaveLength(32);
+  });
+
+  it("rejects strict deploy when VS_SETUP_BOOTSTRAP_SECRET is unset", () => {
+    expect(() =>
+      parseServerEnv(strictBase({ VS_SETUP_BOOTSTRAP_SECRET: undefined })),
+    ).toThrow(/VS_SETUP_BOOTSTRAP_SECRET/);
+  });
+
+  it("rejects strict deploy when VS_SETUP_BOOTSTRAP_SECRET is shorter than 32", () => {
+    expect(() =>
+      parseServerEnv(strictBase({ VS_SETUP_BOOTSTRAP_SECRET: "x".repeat(31) })),
+    ).toThrow(/VS_SETUP_BOOTSTRAP_SECRET/);
+  });
+
+  it("rejects VS_SETUP_BOOTSTRAP_SECRET shorter than 16 characters when set in development", () => {
+    expect(() =>
+      parseServerEnv({
+        ...baseEnv(),
+        VS_SETUP_BOOTSTRAP_SECRET: "123456789012345",
+      }),
+    ).toThrow(/VS_SETUP_BOOTSTRAP_SECRET/);
   });
 
   it("rejects strict deploy when VS_TRUST_PROXY_HEADERS is unset", () => {

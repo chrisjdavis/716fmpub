@@ -222,6 +222,7 @@ export {
   DASHBOARD_ANALYTICS_BUNDLE_SNAPSHOT_KIND,
   recomputeDashboardAnalyticsBundle,
   resolveDashboardAnalyticsBundleRead,
+  tryReadDashboardAnalyticsBundleAllowStale,
   tryReadFreshDashboardAnalyticsBundle,
   type DashboardAnalyticsBundleBodyV1,
   type DashboardAnalyticsBundleRangeSlot,

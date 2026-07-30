@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getPool, issuePasswordRecoveryToken } from "@vs/db";
 import { loadServerEnv } from "@vs/env";
 import { summarizeThrowableForLog } from "@vs/sensitive";
+import { rejectIfAuthAbuseRateLimited } from "@/server/api/auth-abuse-rate-limit";
 import { buildPasswordRecoveryAbsoluteUrl } from "@/server/auth/password-recovery-url";
 import { hashPassword } from "@/server/auth/password";
 import { findUserWithPasswordByEmail } from "@/server/auth/user-repository";
@@ -24,6 +25,10 @@ export async function POST(req: Request): Promise<Response> {
   const transportDenied = rejectUnlessTrustedAuthTransport(req, env);
   if (transportDenied) {
     return transportDenied;
+  }
+  const abuse = await rejectIfAuthAbuseRateLimited(req, env, "email_outbound");
+  if (abuse) {
+    return abuse;
   }
   const parsed = await parseJsonBodyWithSchema(
     req,

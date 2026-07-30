@@ -66,7 +66,53 @@ vi.mock("@/server/api/require-session", () => ({
 }));
 
 import { getDashboardListenSummary, resolveDashboardAnalyticsBundleRead } from "@vs/db";
+import type { DashboardAnalyticsBundleBodyV1 } from "@vs/db";
 import { GET } from "./route";
+
+function emptyRangeSlot(range: "7d" | "30d" | "90d" | "all") {
+  return {
+    summary: {
+      range,
+      total_scrobbles: 0,
+      top_artists: [],
+      top_tracks: [],
+      top_albums: [],
+    },
+    recentListens: [],
+    heroWindow: {
+      weekday_peak: null,
+      timeline_grain: "utc_day" as const,
+      timeline: [],
+    },
+  };
+}
+
+function staleBundleStub(asOf: string): {
+  status: "stale";
+  snapshot_as_of: string;
+  bundle: DashboardAnalyticsBundleBodyV1;
+} {
+  return {
+    status: "stale",
+    snapshot_as_of: asOf,
+    bundle: {
+      schema_version: 1,
+      as_of: asOf,
+      ranges: {
+        "7d": emptyRangeSlot("7d"),
+        "30d": emptyRangeSlot("30d"),
+        "90d": emptyRangeSlot("90d"),
+        all: emptyRangeSlot("all"),
+      },
+      archive_totals: {
+        allTimeScrobbles: 0,
+        firstListenAt: null,
+        topArtistName: null,
+        topArtistPlays: null,
+      },
+    },
+  };
+}
 
 describe("GET /api/analytics/summary", () => {
   beforeEach(() => {
@@ -95,10 +141,9 @@ describe("GET /api/analytics/summary", () => {
 
 
   it("best-effort enqueues dashboard bundle recompute when snapshot is not fresh", async () => {
-    vi.mocked(resolveDashboardAnalyticsBundleRead).mockResolvedValue({
-      status: "stale",
-      snapshot_as_of: "2020-01-01T00:00:00.000Z",
-    });
+    vi.mocked(resolveDashboardAnalyticsBundleRead).mockResolvedValue(
+      staleBundleStub("2020-01-01T00:00:00.000Z"),
+    );
     vi.mocked(getDashboardListenSummary).mockResolvedValue({
       range: "30d",
       total_scrobbles: 3,
@@ -193,10 +238,9 @@ describe("GET /api/analytics/summary", () => {
   });
 
   it("reuses canonical summary within TTL: second request is store_hit and one SQL call (latency proxy)", async () => {
-    vi.mocked(resolveDashboardAnalyticsBundleRead).mockResolvedValue({
-      status: "stale",
-      snapshot_as_of: "2020-01-01T00:00:00.000Z",
-    });
+    vi.mocked(resolveDashboardAnalyticsBundleRead).mockResolvedValue(
+      staleBundleStub("2020-01-01T00:00:00.000Z"),
+    );
     vi.mocked(getDashboardListenSummary).mockResolvedValue({
       range: "30d",
       total_scrobbles: 3,
@@ -224,10 +268,9 @@ describe("GET /api/analytics/summary", () => {
   });
 
   it("VS-79: centralized listening-history invalidation forces the next canonical read to miss", async () => {
-    vi.mocked(resolveDashboardAnalyticsBundleRead).mockResolvedValue({
-      status: "stale",
-      snapshot_as_of: "2020-01-01T00:00:00.000Z",
-    });
+    vi.mocked(resolveDashboardAnalyticsBundleRead).mockResolvedValue(
+      staleBundleStub("2020-01-01T00:00:00.000Z"),
+    );
     vi.mocked(getDashboardListenSummary).mockResolvedValue({
       range: "30d",
       total_scrobbles: 3,

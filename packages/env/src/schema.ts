@@ -469,6 +469,12 @@ const serverEnvObjectSchema = z.object({
    */
   VS_INTERNAL_API_SECRET: z.preprocess(trimToUndefined, z.string().optional()),
   /**
+   * Shared secret required to complete first-run (and post-delete) `/setup`.
+   * Required in staging and production (≥32 chars). Optional in development/test (≥16 when set).
+   * When set, `POST /api/auth/setup` must include a matching `bootstrapSecret`.
+   */
+  VS_SETUP_BOOTSTRAP_SECRET: z.preprocess(trimToUndefined, z.string().optional()),
+  /**
    * When `"true"`, the app may interpret `x-forwarded-for`, `x-forwarded-proto`, and `x-forwarded-host`
    * for rate limiting and HTTPS detection. Staging/production require an explicit `"true"` or `"false"`;
    * choose `"true"` only when the ingress overwrites or strips untrusted forwarded headers.
@@ -606,6 +612,22 @@ const serverEnvSchemaWithRedisRules = serverEnvObjectSchema.superRefine(
           path: ["VS_INTERNAL_API_SECRET"],
         });
       }
+      const setupBootstrap = data.VS_SETUP_BOOTSTRAP_SECRET;
+      if (setupBootstrap === undefined || setupBootstrap.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "VS_SETUP_BOOTSTRAP_SECRET is required in staging and production (prevents unauthenticated instance claim via /setup).",
+          path: ["VS_SETUP_BOOTSTRAP_SECRET"],
+        });
+      } else if (setupBootstrap.length < 32) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "VS_SETUP_BOOTSTRAP_SECRET must be at least 32 characters in staging or production.",
+          path: ["VS_SETUP_BOOTSTRAP_SECRET"],
+        });
+      }
       if (data.VS_TRUST_PROXY_HEADERS === undefined) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -662,6 +684,19 @@ const serverEnvSchemaWithRedisRules = serverEnvObjectSchema.superRefine(
           message:
             "VS_INTERNAL_API_SECRET must be at least 16 characters when set (development and test).",
           path: ["VS_INTERNAL_API_SECRET"],
+        });
+      }
+      const setupBootstrap = data.VS_SETUP_BOOTSTRAP_SECRET;
+      if (
+        setupBootstrap !== undefined &&
+        setupBootstrap.length > 0 &&
+        setupBootstrap.length < 16
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "VS_SETUP_BOOTSTRAP_SECRET must be at least 16 characters when set (development and test).",
+          path: ["VS_SETUP_BOOTSTRAP_SECRET"],
         });
       }
     }

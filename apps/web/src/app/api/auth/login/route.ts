@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPool, tryInsertSecurityAuditEvent } from "@vs/db";
 import { loadServerEnv } from "@vs/env";
+import { rejectIfAuthAbuseRateLimited } from "@/server/api/auth-abuse-rate-limit";
 import { hashPassword, verifyPassword } from "@/server/auth/password";
 import { applyCsrfCookie, newCsrfToken } from "@/server/auth/csrf-cookie";
 import {
@@ -23,6 +24,10 @@ export async function POST(req: Request): Promise<Response> {
   const transportDenied = rejectUnlessTrustedAuthTransport(req, env);
   if (transportDenied) {
     return transportDenied;
+  }
+  const abuse = await rejectIfAuthAbuseRateLimited(req, env, "auth");
+  if (abuse) {
+    return abuse;
   }
   const parsed = await parseJsonBodyWithSchema(
     req,

@@ -80,7 +80,7 @@ describe("browser security headers on middleware responses", () => {
       }),
     );
     const csp = res.headers.get("Content-Security-Policy") ?? "";
-    expect(csp).toContain("script-src 'self' 'unsafe-inline'");
+    expect(csp).toMatch(/script-src 'self' 'nonce-[^']+' 'strict-dynamic' 'unsafe-inline'/);
     expect(csp).not.toContain("'unsafe-eval'");
     expect(csp).toContain("https://static.cloudflareinsights.com");
     expect(csp).toContain("wss://rt.example.com");

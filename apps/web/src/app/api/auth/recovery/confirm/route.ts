@@ -6,6 +6,7 @@ import {
 } from "@vs/db";
 import { loadServerEnv } from "@vs/env";
 import { summarizeThrowableForLog } from "@vs/sensitive";
+import { rejectIfAuthAbuseRateLimited } from "@/server/api/auth-abuse-rate-limit";
 import { hashPassword } from "@/server/auth/password";
 import {
   invalidatePriorSessionsForAuthTransition,
@@ -32,6 +33,10 @@ export async function POST(req: Request): Promise<Response> {
   const transportDenied = rejectUnlessTrustedAuthTransport(req, env);
   if (transportDenied) {
     return transportDenied;
+  }
+  const abuse = await rejectIfAuthAbuseRateLimited(req, env, "auth");
+  if (abuse) {
+    return abuse;
   }
   const parsed = await parseJsonBodyWithSchema(
     req,

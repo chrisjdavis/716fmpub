@@ -47,9 +47,12 @@ export async function GET(
     }
 
     const artifactAccess = computeListenExportArtifactAccess(row);
-    const downloadHref =
+    const download =
       artifactAccess === "available" && row.artifactDeliveryToken
-        ? `/api/export/listens/${encodeURIComponent(row.id)}/download?token=${encodeURIComponent(row.artifactDeliveryToken)}`
+        ? {
+            href: `/api/export/listens/${encodeURIComponent(row.id)}/download`,
+            token: row.artifactDeliveryToken,
+          }
         : null;
 
     return NextResponse.json(
@@ -65,11 +68,11 @@ export async function GET(
         updatedAt: row.updatedAt,
         artifactExpiresAt: row.artifactExpiresAt,
         artifactAccess,
-        download: downloadHref ? { href: downloadHref } : null,
+        download,
         pollAfterMs: EXPORT_LISTEN_STATUS_POLL_AFTER_MS,
         maxPollsHint: EXPORT_LISTEN_STATUS_MAX_POLLS_HINT,
         statusNote:
-          "Progress fields (`itemsProcessed`, `itemsTotal`) are read from Postgres for this export job. `itemsTotal` stays null until the worker finishes and records the final count; do not infer totals from BullMQ. artifactAccess=available means the ZIP is within its server-side retention window and may be downloaded using the opaque `token` query parameter from `download.href` (scoped to this job and user session); after expiry the job becomes expired, the file is removed by the worker, and downloads return HTTP 410.",
+          "Progress fields (`itemsProcessed`, `itemsTotal`) are read from Postgres for this export job. `itemsTotal` stays null until the worker finishes and records the final count; do not infer totals from BullMQ. artifactAccess=available means the ZIP is within its server-side retention window and may be downloaded with `Authorization: Bearer <download.token>` against `download.href` (scoped to this job and user session); after expiry the job becomes expired, the file is removed by the worker, and downloads return HTTP 410.",
       },
       { headers: EXPORT_LISTEN_NO_REFERRER_HEADERS },
     );

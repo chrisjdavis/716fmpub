@@ -43,11 +43,13 @@ export function finalizeTransportSecurityHeaders(
   res: NextResponse,
   request: NextRequest,
   ctx: EdgeTransportContext,
+  scriptNonce?: string,
 ): NextResponse {
   const env = process.env as Record<string, string | undefined>;
   applyBrowserSecurityHeaders(res.headers, {
     nodeEnv: resolveNodeEnvForCsp(env.NODE_ENV),
     realtimeWsUrlCandidates: readRealtimeWsUrlCandidatesFromEnv(env),
+    scriptNonce,
   });
   if (
     ctx.strict &&

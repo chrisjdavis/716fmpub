@@ -11,6 +11,7 @@ export const STAGING_STRICT_REQUIRED_ENV_KEYS = [
   "LISTEN_REALTIME_ENABLED / REALTIME_JWT_SECRET (see schema superRefine)",
   "VS_LOCAL_SEED_PASSWORD (must be unset)",
   "VS_INTERNAL_API_SECRET (optional; when set in strict tiers must be ≥32 chars; when unset, /api/internal/* returns 503)",
+  "VS_SETUP_BOOTSTRAP_SECRET (required in staging/production; ≥32 chars; gates /setup instance claim)",
   "VS_TRUST_PROXY_HEADERS (explicit true|false reverse-proxy forwarded-header trust)",
   "VS_PUBLIC_APP_ORIGIN (canonical https origin for Host/Origin checks and HTTPS upgrade)",
 ] as const;
@@ -30,6 +31,7 @@ export const STAGING_STRICT_SECURITY_ENV_VAR_NAMES = [
   "REALTIME_JWT_SECRET",
   "VS_LOCAL_SEED_PASSWORD",
   "VS_INTERNAL_API_SECRET",
+  "VS_SETUP_BOOTSTRAP_SECRET",
   "VS_TRUST_PROXY_HEADERS",
   "VS_PUBLIC_APP_ORIGIN",
 ] as const;

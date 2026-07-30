@@ -22,9 +22,15 @@ vi.mock("@vs/env", () => ({
   loadServerEnv: vi.fn(() => ({
     NODE_ENV: "test",
     deployEnv: "test",
+    trustProxyHeaders: false,
     ...defaultAbuseEnvFields,
   })),
   isStrictDeployEnv: vi.fn(() => false),
+  isRedisQueuesEnabled: vi.fn(() => false),
+}));
+
+vi.mock("@/server/api/auth-abuse-rate-limit", () => ({
+  rejectIfAuthAbuseRateLimited: vi.fn(async () => null),
 }));
 
 const CSRF = "test-csrf-token-value-32chars!!";
@@ -70,6 +76,9 @@ describe("GET /api/auth/setup", () => {
   it("bootstraps a CSRF cookie", async () => {
     const res = await GET(setupRequest({ method: "GET" }));
     expect(res.status).toBe(200);
+    const body = (await res.json()) as { ok: boolean; bootstrapSecretRequired: boolean };
+    expect(body.ok).toBe(true);
+    expect(body.bootstrapSecretRequired).toBe(false);
     const cookies = getSetCookieLines(res).join("\n");
     expect(cookies).toContain(AUTH_CSRF_COOKIE_NAME);
   });
@@ -151,5 +160,28 @@ describe("POST /api/auth/setup", () => {
       error: "Already set up",
       code: "already_configured",
     });
+  });
+
+  it("returns 403 when bootstrap secret is configured but missing/wrong", async () => {
+    const { loadServerEnv } = await import("@vs/env");
+    vi.mocked(loadServerEnv).mockReturnValueOnce({
+      NODE_ENV: "test",
+      deployEnv: "test",
+      trustProxyHeaders: false,
+      VS_SETUP_BOOTSTRAP_SECRET: "correct-bootstrap-secret!!",
+      ...defaultAbuseEnvFields,
+    } as ReturnType<typeof loadServerEnv>);
+    const req = setupRequest({
+      method: "POST",
+      body: JSON.stringify({
+        email,
+        password: "correct-horse-battery-staple",
+        bootstrapSecret: "wrong-secret",
+      }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(403);
+    await expect(res.json()).resolves.toMatchObject({ code: "bootstrap_secret_invalid" });
+    expect(insertSoleOwnerUser).not.toHaveBeenCalled();
   });
 });

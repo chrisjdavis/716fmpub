@@ -5,12 +5,15 @@ import {
   countListensForUser,
   getPool,
   getSoleOwnerPublicListeningAccess,
-  resolveDashboardAnalyticsBundleRead,
+  tryReadDashboardAnalyticsBundleAllowStale,
+  type DashboardAnalyticsBundleBodyV1,
 } from "@vs/db";
 import { PRODUCT_NAME, sanitizeUserFacingPlainText } from "@vs/domain";
 import { loadServerEnv } from "@vs/env";
 import { AppBrandMark } from "@/components/app-brand-mark";
 import { PublicHomeTopbarActions } from "@/components/public-site-header-nav";
+import { displayUtcWeekdayPeak } from "@/app/dashboard/dashboard-window-behavior";
+import { formatCount } from "@/app/dashboard/format-count";
 import { getServerSession } from "@/server/auth/get-server-session";
 import { isInstanceConfigured } from "@/server/instance-configured";
 import {
@@ -29,6 +32,12 @@ type HomeShellProps = Readonly<{
   children: React.ReactNode;
   /** First-run only — Set up may appear in the topbar. */
   showSetupInHeader?: boolean;
+}>;
+
+type PublicHomeMetricCard = Readonly<{
+  kicker: string;
+  title: string;
+  detail: string | null;
 }>;
 
 function HomeShell({ children, showSetupInHeader = false }: HomeShellProps) {
@@ -59,8 +68,75 @@ function HomeShell({ children, showSetupInHeader = false }: HomeShellProps) {
   );
 }
 
-function formatListenCount(n: number): string {
-  return n.toLocaleString("en-US");
+function firstListenUtcYear(iso: string | null): number | null {
+  if (!iso) {
+    return null;
+  }
+  const ms = Date.parse(iso);
+  if (!Number.isFinite(ms)) {
+    return null;
+  }
+  return new Date(ms).getUTCFullYear();
+}
+
+/**
+ * Lightweight public teaser of the same metric card shapes as logged-in home
+ * (peak day / most replayed / top album / recent volume) — no AI briefing.
+ */
+function buildPublicHomeMetricCards(
+  bundle: DashboardAnalyticsBundleBodyV1,
+): readonly PublicHomeMetricCard[] {
+  const cards: PublicHomeMetricCard[] = [];
+  const allSlot = bundle.ranges.all;
+  const weekSlot = bundle.ranges["7d"];
+  const weekTotal = weekSlot.summary.total_scrobbles;
+  const allSummary = allSlot.summary;
+
+  if (weekTotal > 0) {
+    cards.push({
+      kicker: "Last 7 days",
+      title: formatCount(weekTotal),
+      detail: "Plays in the rolling week",
+    });
+  }
+
+  const peak = displayUtcWeekdayPeak(allSlot.heroWindow.weekday_peak);
+  if (peak) {
+    cards.push({
+      kicker: "Peak day",
+      title: peak.name,
+      detail: `${formatCount(peak.count)} plays on that weekday (UTC)`,
+    });
+  }
+
+  const topTrack = allSummary.top_tracks[0];
+  if (topTrack && topTrack.plays > 0) {
+    cards.push({
+      kicker: "Most replayed",
+      title: sanitizeUserFacingPlainText(topTrack.title),
+      detail: `${sanitizeUserFacingPlainText(topTrack.artist_name)} · ${formatCount(topTrack.plays)} plays`,
+    });
+  }
+
+  const topAlbum = allSummary.top_albums[0];
+  if (topAlbum && topAlbum.plays > 0 && cards.length < 4) {
+    cards.push({
+      kicker: "Top album",
+      title: sanitizeUserFacingPlainText(topAlbum.title),
+      detail: `${sanitizeUserFacingPlainText(topAlbum.artist_name)} · ${formatCount(topAlbum.plays)} plays`,
+    });
+  }
+
+  const sinceYear = firstListenUtcYear(bundle.archive_totals.firstListenAt);
+  if (sinceYear != null && cards.length < 4) {
+    cards.push({
+      kicker: "Listening since",
+      title: String(sinceYear),
+      detail: "First play in this archive",
+    });
+  }
+
+  return cards.slice(0, 4);
 }
 
 export default async function HomePage() {
@@ -127,9 +203,10 @@ export default async function HomePage() {
     );
   }
 
-  const [listenCount, bundleRead] = await Promise.all([
+  const [listenCount, bundle] = await Promise.all([
     countListensForUser(pool, access.userId),
-    resolveDashboardAnalyticsBundleRead(pool, access.userId),
+    // Allow stale: public teaser should still show metrics between recomputes.
+    tryReadDashboardAnalyticsBundleAllowStale(pool, access.userId),
   ]);
 
   const ownerLabelRaw = access.display_name?.trim() || null;
@@ -137,13 +214,13 @@ export default async function HomePage() {
     ? sanitizeUserFacingPlainText(ownerLabelRaw)
     : null;
 
-  const archiveTotals =
-    bundleRead.status === "fresh" ? bundleRead.bundle.archive_totals : null;
+  const archiveTotals = bundle?.archive_totals ?? null;
   const displayListenCount =
     archiveTotals != null ? archiveTotals.allTimeScrobbles : listenCount;
+  const metricCards = bundle != null ? buildPublicHomeMetricCards(bundle) : [];
   const topArtists =
-    bundleRead.status === "fresh"
-      ? bundleRead.bundle.ranges.all.summary.top_artists.slice(0, 5).map((a) => ({
+    bundle != null
+      ? bundle.ranges.all.summary.top_artists.slice(0, 5).map((a) => ({
           name: sanitizeUserFacingPlainText(a.name),
           plays: a.plays,
         }))
@@ -152,6 +229,7 @@ export default async function HomePage() {
     archiveTotals?.topArtistName != null
       ? sanitizeUserFacingPlainText(archiveTotals.topArtistName)
       : null;
+  const hasBodySections = metricCards.length > 0 || topArtists.length > 0;
 
   return (
     <HomeShell>
@@ -165,7 +243,7 @@ export default async function HomePage() {
             <p className={styles.specSub}>
               {displayListenCount > 0 ? (
                 <>
-                  {formatListenCount(displayListenCount)} listens on this instance
+                  {formatCount(displayListenCount)} listens on this instance
                   {topArtistFallback ? (
                     <>
                       {" "}
@@ -192,30 +270,54 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {topArtists.length > 0 ? (
+        {hasBodySections ? (
           <div className={styles.specSectionsWrap}>
-            <section className={styles.specSection} aria-labelledby="tops-title">
-              <h2 id="tops-title" className={styles.specSectionTitle}>
-                Top artists
-              </h2>
-              <p className={styles.specSectionLead}>All-time on this instance</p>
-              <ol className={styles.specTeaserList}>
-                {topArtists.map((artist, i) => (
-                  <li key={`${artist.name}-${i}`} className={styles.specTeaserRow}>
-                    <span className={styles.specTeaserIndex}>{String(i + 1).padStart(2, "0")}</span>
-                    <span className={styles.specTeaserName}>{artist.name}</span>
-                    <span className={styles.specTeaserMeta}>
-                      {formatListenCount(artist.plays)} plays
-                    </span>
-                  </li>
-                ))}
-              </ol>
-              <div className={styles.specHeroActions}>
-                <Link href={PUBLIC_EXPLORE_PATH} className={styles.specCtaSecondary}>
-                  Open Explore
-                </Link>
-              </div>
-            </section>
+            {metricCards.length > 0 ? (
+              <section className={styles.specSection} aria-labelledby="metrics-title">
+                <h2 id="metrics-title" className={styles.specSectionTitle}>
+                  Listening snapshot
+                </h2>
+                <p className={styles.specSectionLead}>
+                  Recent volume, peak day, and favorites from this archive.
+                </p>
+                <ul className={styles.specMetricGrid}>
+                  {metricCards.map((card) => (
+                    <li key={`${card.kicker}-${card.title}`} className={styles.specMetricCard}>
+                      <p className={styles.specMetricKicker}>{card.kicker}</p>
+                      <p className={styles.specMetricTitle}>{card.title}</p>
+                      {card.detail ? (
+                        <p className={styles.specMetricDetail}>{card.detail}</p>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+
+            {topArtists.length > 0 ? (
+              <section className={styles.specSection} aria-labelledby="tops-title">
+                <h2 id="tops-title" className={styles.specSectionTitle}>
+                  Top artists
+                </h2>
+                <p className={styles.specSectionLead}>All-time on this instance</p>
+                <ol className={styles.specTeaserList}>
+                  {topArtists.map((artist, i) => (
+                    <li key={`${artist.name}-${i}`} className={styles.specTeaserRow}>
+                      <span className={styles.specTeaserIndex}>{String(i + 1).padStart(2, "0")}</span>
+                      <span className={styles.specTeaserName}>{artist.name}</span>
+                      <span className={styles.specTeaserMeta}>
+                        {formatCount(artist.plays)} plays
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+                <div className={styles.specHeroActions}>
+                  <Link href={PUBLIC_EXPLORE_PATH} className={styles.specCtaSecondary}>
+                    Open Explore
+                  </Link>
+                </div>
+              </section>
+            ) : null}
           </div>
         ) : null}
       </div>

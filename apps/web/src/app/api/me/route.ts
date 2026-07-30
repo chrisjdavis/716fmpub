@@ -22,6 +22,7 @@ import {
   type ProductPlan,
 } from "@vs/domain";
 import { loadServerEnv } from "@vs/env";
+import { summarizeThrowableForLog } from "@vs/sensitive";
 import {
   createAnalyticsQueue,
   createExportsQueue,
@@ -133,7 +134,10 @@ async function deleteExportArtifactsBestEffort(
       absolutePath = resolveExportArtifactAbsolutePath(artifactsBaseDir, relativePath);
     } catch (err) {
       failed += 1;
-      console.warn("[api/me] refusing unsafe export artifact path during account deletion:", err);
+      console.warn(
+        "[api/me] refusing unsafe export artifact path during account deletion:",
+        summarizeThrowableForLog(err),
+      );
       continue;
     }
     try {
@@ -148,7 +152,10 @@ async function deleteExportArtifactsBestEffort(
         continue;
       }
       failed += 1;
-      console.warn("[api/me] export artifact unlink failed during account deletion:", err);
+      console.warn(
+        "[api/me] export artifact unlink failed during account deletion:",
+        summarizeThrowableForLog(err),
+      );
     }
   }
   return { deleted, failed };
@@ -349,7 +356,10 @@ export async function DELETE(req: Request): Promise<Response> {
           { status: 409 },
         );
       }
-      console.error("[api/me] account deletion operation failed:", err);
+      console.error(
+        "[api/me] account deletion operation failed:",
+        summarizeThrowableForLog(err),
+      );
       return NextResponse.json(
         {
           error:

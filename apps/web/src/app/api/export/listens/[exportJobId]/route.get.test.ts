@@ -86,7 +86,7 @@ describe("GET /api/export/listens/[exportJobId]", () => {
     expect(getExportJobByIdForUser).not.toHaveBeenCalled();
   });
 
-  it("returns a download href scoped with an opaque token when the artifact is available", async () => {
+  it("returns a download href and bearer token when the artifact is available", async () => {
     const exportId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
     const token = "s".repeat(43);
     vi.mocked(getExportJobByIdForUser).mockResolvedValueOnce({
@@ -108,9 +108,11 @@ describe("GET /api/export/listens/[exportJobId]", () => {
       params: Promise.resolve({ exportJobId: exportId }),
     });
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { download: { href: string } | null };
-    expect(body.download?.href).toContain(`/api/export/listens/${exportId}/download?token=`);
-    expect(body.download?.href).toContain(`token=${encodeURIComponent(token)}`);
+    const body = (await res.json()) as {
+      download: { href: string; token: string } | null;
+    };
+    expect(body.download?.href).toBe(`/api/export/listens/${exportId}/download`);
+    expect(body.download?.token).toBe(token);
     expect(res.headers.get("Referrer-Policy")).toBe("no-referrer");
   });
 });

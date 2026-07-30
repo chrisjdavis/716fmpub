@@ -122,12 +122,16 @@ describe("POST /api/me/email-change/request", () => {
     expect(withConsumedStepUpToken).not.toHaveBeenCalled();
   });
 
-  it("returns 409 when new email is already registered", async () => {
+  it("returns a uniform success when new email is already registered (anti-enumeration)", async () => {
     hoistedPool.query.mockImplementation((sql: string) => {
       if (sql.includes("select id from users where email")) {
         return Promise.resolve({ rows: [{ id: "other-user-id" }] });
       }
       return Promise.resolve({ rows: [] });
+    });
+    vi.mocked(withConsumedStepUpToken).mockResolvedValueOnce({
+      ok: true,
+      value: undefined,
     });
     const res = await POST(
       postJson({
@@ -135,8 +139,11 @@ describe("POST /api/me/email-change/request", () => {
         stepUpToken: "step-token",
       }),
     );
-    expect(res.status).toBe(409);
-    expect(withConsumedStepUpToken).not.toHaveBeenCalled();
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { ok: boolean };
+    expect(body.ok).toBe(true);
+    expect(withConsumedStepUpToken).toHaveBeenCalled();
+    expect(mailerMocks.sendEmailChangeVerification).not.toHaveBeenCalled();
   });
 
   it("returns 403 when step-up consumption fails", async () => {

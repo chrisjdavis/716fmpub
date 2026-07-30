@@ -50,6 +50,10 @@ vi.mock("@vs/env", () => ({
   isStrictDeployEnv: vi.fn(() => false),
 }));
 
+vi.mock("@/server/api/auth-abuse-rate-limit", () => ({
+  rejectIfAuthAbuseRateLimited: vi.fn(async () => null),
+}));
+
 import { hashPassword } from "@/server/auth/password";
 import { findUserEmailById, updateUserPasswordHash } from "@/server/auth/user-repository";
 import { getWebTransactionalMailer } from "@/server/transactional-mailer";

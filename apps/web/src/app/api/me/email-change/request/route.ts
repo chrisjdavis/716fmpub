@@ -54,19 +54,57 @@ export async function POST(req: Request): Promise<Response> {
       [parsed.data.newEmail],
     );
     if (dup.rows[0]) {
+      // Consume step-up so probes cannot reuse one confirmation across many emails.
+      const step = await withConsumedStepUpToken(
+        pool,
+        {
+          userId: user.id,
+          purpose: STEP_UP_PURPOSE_CHANGE_ACCOUNT_EMAIL,
+          rawToken: parsed.data.stepUpToken,
+        },
+        async () => undefined,
+      );
+      if (!step.ok) {
+        await tryInsertSecurityAuditEvent(pool, {
+          actorUserId: user.id,
+          action: "account.email_change_request",
+          outcome: "denied",
+          metadata: { reason: step.reason },
+        });
+        const byReason = {
+          invalid_token: {
+            code: "step_up_invalid" as const,
+            error: "Step-up confirmation is missing or not valid for this action.",
+          },
+          expired: {
+            code: "step_up_expired" as const,
+            error: "Step-up confirmation has expired. Re-enter your password to continue.",
+          },
+          replayed: {
+            code: "step_up_replayed" as const,
+            error: "This step-up confirmation was already used.",
+          },
+          wrong_user: {
+            code: "step_up_invalid" as const,
+            error: "Step-up confirmation is missing or not valid for this action.",
+          },
+        };
+        const payload = byReason[step.reason];
+        return NextResponse.json({ error: payload.error, code: payload.code }, { status: 403 });
+      }
       await tryInsertSecurityAuditEvent(pool, {
         actorUserId: user.id,
         action: "account.email_change_request",
         outcome: "denied",
         metadata: { reason: "email_taken" },
       });
-      return NextResponse.json(
-        {
-          error: "That email address is already in use on another account.",
-          code: "email_unavailable" as const,
-        },
-        { status: 409 },
-      );
+      // Uniform success shape (anti-enumeration); no token issued and no mail sent.
+      return NextResponse.json({
+        ok: true as const,
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+        verificationDispatch: { status: "sent" as const },
+        noticeDispatch: { status: "sent" as const },
+      });
     }
 
     const step = await withConsumedStepUpToken(

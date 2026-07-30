@@ -408,6 +408,8 @@ describe.sequential("dashboardAnalyticsRecompute (PGlite)", () => {
     expect(resolved.status).toBe("stale");
     if (resolved.status === "stale") {
       expect(resolved.snapshot_as_of).toMatch(/^\d{4}-/);
+      expect(resolved.bundle.as_of).toBe(resolved.snapshot_as_of);
+      expect(resolved.bundle.archive_totals.allTimeScrobbles).toBeGreaterThan(0);
     }
   });
 

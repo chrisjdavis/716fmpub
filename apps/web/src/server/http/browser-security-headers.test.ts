@@ -34,8 +34,9 @@ describe("buildContentSecurityPolicy", () => {
     const prod = buildContentSecurityPolicy({
       nodeEnv: "production",
       realtimeWsUrlCandidates: ["wss://rt.example.com/ws"],
+      scriptNonce: "test-nonce-value",
     });
-    expect(prod).toContain("script-src 'self' 'unsafe-inline'");
+    expect(prod).toContain("script-src 'self' 'nonce-test-nonce-value' 'strict-dynamic' 'unsafe-inline'");
     expect(prod).toContain("https://static.cloudflareinsights.com");
     expect(prod).not.toContain("'unsafe-eval'");
     expect(prod).toContain("https://cloudflareinsights.com");

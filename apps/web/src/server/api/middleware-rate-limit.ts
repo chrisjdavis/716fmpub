@@ -59,16 +59,14 @@ function clientIp(request: NextRequest, trustProxyHeaders: boolean): string {
   if (cf) {
     return cf;
   }
-  const xff = request.headers.get("x-forwarded-for")?.trim();
-  if (xff) {
-    const first = xff.split(",")[0]?.trim();
-    if (first) {
-      return first;
-    }
-  }
   const realIp = request.headers.get("x-real-ip")?.trim();
   if (realIp) {
     return realIp;
+  }
+  const xff = request.headers.get("x-forwarded-for")?.trim();
+  if (xff && !xff.includes(",")) {
+    // Only trust single-hop XFF (ingress overwrite). Multi-hop lists are spoofable at the client.
+    return xff;
   }
   return platformInjectedClientIp(request) ?? "unknown";
 }

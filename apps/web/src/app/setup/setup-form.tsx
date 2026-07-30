@@ -3,10 +3,7 @@
 import { type FormEvent, useEffect, useState } from "react";
 import { AuthEmailPasswordFields } from "@/components/auth-email-password-fields";
 import { signupFormShellClassName } from "@/app/access-layout";
-import {
-  ensurePublicSetupCsrfCookieValue,
-  readBrowserCsrfCookieValue,
-} from "@/lib/browser-csrf";
+import { readBrowserCsrfCookieValue } from "@/lib/browser-csrf";
 import { readUserFacingErrorFromResponse } from "@/lib/read-user-facing-api-error";
 import { API_CSRF_HEADER_NAME } from "@vs/domain/auth-csrf-header";
 
@@ -14,11 +11,24 @@ export function SetupForm() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [bootstrapSecretRequired, setBootstrapSecretRequired] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      await ensurePublicSetupCsrfCookieValue();
+      try {
+        const res = await fetch("/api/auth/setup", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
+        if (!cancelled && res.ok) {
+          const body = (await res.json()) as { bootstrapSecretRequired?: boolean };
+          setBootstrapSecretRequired(Boolean(body.bootstrapSecretRequired));
+        }
+      } catch {
+        // Form still usable; server enforces secret when configured.
+      }
       if (!cancelled) {
         setHydrated(true);
       }
@@ -37,11 +47,27 @@ export function SetupForm() {
       const fd = new FormData(form);
       const email = String(fd.get("email") ?? "");
       const password = String(fd.get("password") ?? "");
-      await ensurePublicSetupCsrfCookieValue();
-      const csrf = readBrowserCsrfCookieValue();
+      const bootstrapSecret = String(fd.get("bootstrapSecret") ?? "").trim();
+      let csrf = readBrowserCsrfCookieValue();
+      if (!csrf) {
+        const boot = await fetch("/api/auth/setup", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
+        if (!boot.ok) {
+          setError("Could not prepare a secure setup session. Refresh and try again.");
+          return;
+        }
+        csrf = readBrowserCsrfCookieValue();
+      }
       if (!csrf) {
         setError("Could not prepare a secure setup session. Refresh and try again.");
         return;
+      }
+      const body: Record<string, string> = { email, password };
+      if (bootstrapSecret) {
+        body.bootstrapSecret = bootstrapSecret;
       }
       const res = await fetch("/api/auth/setup", {
         method: "POST",
@@ -50,7 +76,7 @@ export function SetupForm() {
           [API_CSRF_HEADER_NAME]: csrf,
         },
         credentials: "include",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) {
         setError(await readUserFacingErrorFromResponse(res));
@@ -71,6 +97,23 @@ export function SetupForm() {
         passwordAutoComplete="new-password"
         passwordMinLength={12}
       />
+      <label className="flex flex-col gap-2">
+        <span className="font-mono text-label uppercase tracking-[0.08em] text-overline">
+          Bootstrap secret
+          {bootstrapSecretRequired ? " (required)" : " (if configured)"}
+        </span>
+        <input
+          name="bootstrapSecret"
+          type="password"
+          autoComplete="off"
+          required={bootstrapSecretRequired}
+          className="vs-control"
+          placeholder="VS_SETUP_BOOTSTRAP_SECRET"
+        />
+        <span className="font-mono text-caption uppercase tracking-[0.04em] text-muted">
+          Matches the server env var that prevents unauthenticated instance claim.
+        </span>
+      </label>
       {error ? (
         <p
           className="font-mono text-caption uppercase tracking-[0.04em] text-error"

@@ -7,7 +7,7 @@ import { browserCsrfHeaderRecord } from "@/lib/browser-csrf";
 type StatusBody = {
   stage: string;
   artifactAccess?: "none" | "available" | "expired";
-  download: { href: string } | null;
+  download: { href: string; token?: string } | null;
   errorMessage: string | null;
   itemsProcessed?: number;
   itemsTotal?: number | null;
@@ -21,6 +21,40 @@ type PostBody = {
 };
 
 const PREDOWNLOAD_MS = 480;
+
+const EXPORT_DOWNLOAD_HREF_RE =
+  /^\/api\/export\/listens\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/download$/i;
+
+function isSafeExportDownloadHref(href: string): boolean {
+  return EXPORT_DOWNLOAD_HREF_RE.test(href);
+}
+
+async function downloadExportZip(href: string, token: string): Promise<void> {
+  const res = await fetch(href, {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    throw new Error(await readJsonError(res));
+  }
+  const blob = await res.blob();
+  const objectUrl = URL.createObjectURL(blob);
+  try {
+    const a = document.createElement("a");
+    const disposition = res.headers.get("Content-Disposition");
+    const match = disposition?.match(/filename="([^"]+)"/i);
+    a.href = objectUrl;
+    a.download = match?.[1] ?? "listens-export.zip";
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
 
 function clampPollMs(raw: unknown): number {
   if (typeof raw !== "number" || !Number.isFinite(raw)) {
@@ -140,13 +174,17 @@ export function ListenExportStartButton({
         }
         const downloadReady =
           Boolean(js.download?.href) &&
+          Boolean(js.download?.token) &&
           (js.artifactAccess === "available" ||
             (js.artifactAccess === undefined && js.stage === "completed"));
-        if (downloadReady && js.download?.href) {
+        if (downloadReady && js.download?.href && js.download.token) {
+          if (!isSafeExportDownloadHref(js.download.href)) {
+            throw new Error("Export download path was rejected.");
+          }
           setProgressHint(null);
           setStartingDownload(true);
           await new Promise((r) => setTimeout(r, PREDOWNLOAD_MS));
-          window.location.assign(js.download.href);
+          await downloadExportZip(js.download.href, js.download.token);
           return;
         }
         await new Promise((r) => setTimeout(r, pollMs));

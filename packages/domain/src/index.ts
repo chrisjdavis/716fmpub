@@ -47,6 +47,7 @@ export {
   IMPORT_PIPELINE_STAGES,
   isTerminalImportJobStage,
   lastfmPreferredCoverImageUrlFromWirePayload,
+  sanitizeRemoteCoverImageUrl,
   normalizeImportMbid,
   normalizeImportString,
   parseImportPipelineStage,

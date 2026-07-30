@@ -1,6 +1,6 @@
-import { createHash, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import type { ServerEnv } from "@vs/env";
+import { timingSafeEqualUtf8Secrets } from "@/server/api/timing-safe-secret";
 
 const INTERNAL_DISABLED_BODY = {
   error: "Internal API is not configured for this deployment",
@@ -11,12 +11,6 @@ const INTERNAL_FORBIDDEN_BODY = {
   error: "Forbidden",
   code: "internal_api_forbidden",
 } as const;
-
-function timingSafeEqualUtf8Strings(a: string, b: string): boolean {
-  const da = createHash("sha256").update(a, "utf8").digest();
-  const db = createHash("sha256").update(b, "utf8").digest();
-  return timingSafeEqual(da, db);
-}
 
 function readBearerToken(authorization: string | null): string | null {
   if (!authorization?.trim()) {
@@ -39,7 +33,7 @@ export function requireInternalApiAuth(
     return NextResponse.json(INTERNAL_DISABLED_BODY, { status: 503 });
   }
   const presented = readBearerToken(req.headers.get("authorization"));
-  if (!presented || !timingSafeEqualUtf8Strings(presented, expected)) {
+  if (!presented || !timingSafeEqualUtf8Secrets(presented, expected)) {
     return NextResponse.json(INTERNAL_FORBIDDEN_BODY, { status: 403 });
   }
   return null;

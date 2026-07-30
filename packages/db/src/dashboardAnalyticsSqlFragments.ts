@@ -53,7 +53,11 @@ export const LASTFM_COVER_IMAGE_URL_SQL = `(
     from elems
     where jsonb_typeof(elem) = 'object'
   )
-  select u from ranked where u is not null order by rk asc limit 1
+  select u from ranked
+  where u is not null
+    and u ~* '^https?://'
+    and u !~* '[[:space:]\\\\]'
+  order by rk asc limit 1
 )`;
 
 export const TOP_TRACK_RELEASE_MBID_SQL = `nullif(

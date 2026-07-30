@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { sanitizeRemoteCoverImageUrl } from "@vs/domain/import/lastfm-cover-image-url";
 import type { TimeMachineExploreModel } from "@/server/load-time-machine-explore";
 import { exploreNarrativePlainText } from "@/server/time-machine-explore-narrative";
 import { DashboardExploreNarrativeParagraph } from "./dashboard-explore-narrative-paragraph";
@@ -109,11 +110,11 @@ export function DashboardTimeMachineExplore({
                         key={`${mod.tagKey}-${mod.tag}-${i}`}
                         className={`${styles.moduleCard} min-h-[148px] w-full rounded-md border border-hairline bg-surface p-5`}
                       >
-                        {mod.imageUrl ? (
+                        {mod.imageUrl && sanitizeRemoteCoverImageUrl(mod.imageUrl) ? (
                           <div className={styles.moduleCardWithArt}>
                             {/* eslint-disable-next-line @next/next/no-img-element -- remote Last.fm CDN */}
                             <img
-                              src={mod.imageUrl}
+                              src={sanitizeRemoteCoverImageUrl(mod.imageUrl)!}
                               alt={mod.imageAlt ?? ""}
                               width={56}
                               height={56}

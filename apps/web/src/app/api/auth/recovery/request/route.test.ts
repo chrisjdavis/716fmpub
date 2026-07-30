@@ -24,6 +24,10 @@ vi.mock("@vs/env", () => ({
   isStrictDeployEnv: vi.fn(() => false),
 }));
 
+vi.mock("@/server/api/auth-abuse-rate-limit", () => ({
+  rejectIfAuthAbuseRateLimited: vi.fn(async () => null),
+}));
+
 vi.mock("@/server/auth/user-repository", () => ({
   findUserWithPasswordByEmail: vi.fn(),
 }));

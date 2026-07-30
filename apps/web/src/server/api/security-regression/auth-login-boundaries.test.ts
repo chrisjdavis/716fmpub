@@ -20,6 +20,10 @@ vi.mock("@vs/env", () => ({
   isStrictDeployEnv: vi.fn(() => false),
 }));
 
+vi.mock("@/server/api/auth-abuse-rate-limit", () => ({
+  rejectIfAuthAbuseRateLimited: vi.fn(async () => null),
+}));
+
 vi.mock("next/headers", () => ({
   cookies: vi.fn(),
 }));

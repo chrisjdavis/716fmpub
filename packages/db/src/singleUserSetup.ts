@@ -34,6 +34,7 @@ export async function insertSoleOwnerUser(
     return { ok: false, reason: "already_configured" };
   }
 
+  // Leave email_verified_at null until the owner proves mailbox control (resend / verify flow).
   const { rows } = await client.query<{ id: string }>(
     `insert into users (
        email,
@@ -42,7 +43,7 @@ export async function insertSoleOwnerUser(
        account_role,
        product_plan
      )
-     values ($1, $2, now(), 'owner', 'advanced')
+     values ($1, $2, null, 'owner', 'advanced')
      returning id`,
     [args.canonicalEmail, args.passwordHash],
   );

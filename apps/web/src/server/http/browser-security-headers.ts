@@ -9,6 +9,11 @@ export type BrowserSecurityHeaderInput = {
   nodeEnv: NodeEnvForCsp;
   /** Non-empty trimmed WebSocket base URLs from env (ws: or wss:). */
   realtimeWsUrlCandidates: readonly string[];
+  /**
+   * Per-request CSP nonce. When set, production browsers that support CSP2 ignore
+   * `'unsafe-inline'` for scripts that lack the matching nonce attribute.
+   */
+  scriptNonce?: string;
 };
 
 /**
@@ -65,8 +70,10 @@ export function buildContentSecurityPolicy(input: BrowserSecurityHeaderInput): s
 
   const scriptParts = [
     "'self'",
-    // Next App Router emits inline bootstrap/RSC scripts. Without a nonce pipeline, production
-    // Safari/Chromium refuse those scripts and the app partially hydrates.
+    // Next App Router emits inline bootstrap/RSC scripts. Prefer a per-request nonce
+    // (middleware sets `x-nonce` + this CSP value). Keep `'unsafe-inline'` only as a
+    // legacy-browser fallback; CSP2+ ignores it when a nonce is present.
+    ...(input.scriptNonce ? [`'nonce-${input.scriptNonce}'`, "'strict-dynamic'"] : []),
     "'unsafe-inline'",
     "https://static.cloudflareinsights.com",
   ];

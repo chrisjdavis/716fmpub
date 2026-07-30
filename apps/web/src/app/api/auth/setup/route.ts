@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { countUsers, getPool, insertSoleOwnerUser } from "@vs/db";
 import { loadServerEnv } from "@vs/env";
+import { rejectIfAuthAbuseRateLimited } from "@/server/api/auth-abuse-rate-limit";
 import { apiCsrfInvalidJson } from "@/server/api/api-csrf-response";
 import { authSetupBodySchema } from "@/server/api/auth-account-input-schemas";
+import { timingSafeEqualUtf8Secrets } from "@/server/api/timing-safe-secret";
 import { parseJsonBodyWithSchema } from "@/server/api/validated-json-body";
 import { applyCsrfCookie, csrfDoubleSubmitValid, newCsrfToken } from "@/server/auth/csrf-cookie";
 import { hashPassword } from "@/server/auth/password";
@@ -26,7 +28,10 @@ export async function GET(req: Request): Promise<Response> {
     if (transportDenied) {
       return transportDenied;
     }
-    const res = NextResponse.json({ ok: true });
+    const res = NextResponse.json({
+      ok: true,
+      bootstrapSecretRequired: Boolean(env.VS_SETUP_BOOTSTRAP_SECRET),
+    });
     applyCsrfCookie(res, newCsrfToken());
     return res;
   });
@@ -38,6 +43,11 @@ export async function POST(req: Request): Promise<Response> {
     const transportDenied = rejectUnlessTrustedAuthTransport(req, env);
     if (transportDenied) {
       return transportDenied;
+    }
+
+    const abuse = await rejectIfAuthAbuseRateLimited(req, env, "email_outbound");
+    if (abuse) {
+      return abuse;
     }
 
     const csrfOk = await csrfDoubleSubmitValid(req);
@@ -52,6 +62,20 @@ export async function POST(req: Request): Promise<Response> {
     );
     if (!parsed.ok) {
       return parsed.response;
+    }
+
+    const expectedBootstrap = env.VS_SETUP_BOOTSTRAP_SECRET;
+    if (expectedBootstrap !== undefined && expectedBootstrap.length > 0) {
+      const presented = parsed.data.bootstrapSecret ?? "";
+      if (!timingSafeEqualUtf8Secrets(presented, expectedBootstrap)) {
+        return NextResponse.json(
+          {
+            error: "Invalid bootstrap secret",
+            code: "bootstrap_secret_invalid",
+          },
+          { status: 403 },
+        );
+      }
     }
 
     const email = parsed.data.email;

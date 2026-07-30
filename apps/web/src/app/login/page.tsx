@@ -7,14 +7,8 @@ import {
 } from "@/app/access-layout";
 import { PublicListeningAuthNavPrefix } from "@/components/public-site-header-nav";
 import { isInstanceConfigured } from "@/server/instance-configured";
+import { sanitizeNextPath } from "@/server/http/safe-next-path";
 import { LoginForm } from "./login-form";
-
-function sanitizeNext(next: string | undefined): string {
-  if (!next || !next.startsWith("/") || next.startsWith("//")) {
-    return "/dashboard";
-  }
-  return next;
-}
 
 export default async function LoginPage({
   searchParams,
@@ -26,7 +20,7 @@ export default async function LoginPage({
   }
 
   const { next, recovered } = await searchParams;
-  const nextPath = sanitizeNext(next);
+  const nextPath = sanitizeNextPath(next);
   const showRecoveryNotice = recovered === "1";
 
   return (

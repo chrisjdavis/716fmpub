@@ -31,4 +31,11 @@ describe("lastfmPreferredCoverImageUrlFromWirePayload", () => {
       "https://cdn.example/large.png",
     );
   });
+
+  it("rejects non-http(s) cover URLs", () => {
+    const payload = {
+      image: [{ size: "large", "#text": "javascript:alert(1)" }],
+    };
+    expect(lastfmPreferredCoverImageUrlFromWirePayload(payload)).toBeNull();
+  });
 });

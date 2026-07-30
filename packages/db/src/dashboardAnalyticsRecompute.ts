@@ -52,7 +52,8 @@ export type ResolveDashboardAnalyticsBundleResult =
   | { status: "fresh"; bundle: DashboardAnalyticsBundleBodyV1 }
   | { status: "missing" }
   | { status: "invalid_body" }
-  | { status: "stale"; snapshot_as_of: string };
+  /** Parsed body is still returned so soft consumers (e.g. public `/` teaser) can show near-current metrics. */
+  | { status: "stale"; snapshot_as_of: string; bundle: DashboardAnalyticsBundleBodyV1 };
 
 function parseBundleBodyV1(raw: unknown): DashboardAnalyticsBundleBodyV1 | null {
   if (raw === null || typeof raw !== "object") {
@@ -230,7 +231,7 @@ export async function resolveDashboardAnalyticsBundleRead(
     [userId, parsed.as_of],
   );
   if (staleRows[0]?.x === true) {
-    return { status: "stale", snapshot_as_of: parsed.as_of };
+    return { status: "stale", snapshot_as_of: parsed.as_of, bundle: parsed };
   }
   return { status: "fresh", bundle: parsed };
 }
@@ -248,4 +249,25 @@ export async function tryReadFreshDashboardAnalyticsBundle(
     return resolved.bundle;
   }
   return null;
+}
+
+/**
+ * Parsed dashboard bundle body when the snapshot row exists and validates, including when
+ * listens have moved past `as_of`. Soft surfaces (public `/` teaser) prefer this over
+ * {@link tryReadFreshDashboardAnalyticsBundle} so near-current metrics still render.
+ */
+export async function tryReadDashboardAnalyticsBundleAllowStale(
+  db: DashboardAnalyticsDbExecutor,
+  userId: string,
+): Promise<DashboardAnalyticsBundleBodyV1 | null> {
+  const { rows } = await db.query<{ body: unknown }>(
+    `select body from analytics_snapshots
+     where user_id = $1::uuid and kind = $2`,
+    [userId, DASHBOARD_ANALYTICS_BUNDLE_SNAPSHOT_KIND],
+  );
+  const row = rows[0];
+  if (!row) {
+    return null;
+  }
+  return parseBundleBodyV1(row.body);
 }
