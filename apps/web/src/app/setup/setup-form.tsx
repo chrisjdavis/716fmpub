@@ -8,7 +8,7 @@ import {
   readBrowserCsrfCookieValue,
 } from "@/lib/browser-csrf";
 import { readUserFacingErrorFromResponse } from "@/lib/read-user-facing-api-error";
-import { API_CSRF_HEADER_NAME } from "@vs/domain";
+import { API_CSRF_HEADER_NAME } from "@vs/domain/auth-csrf-header";
 
 export function SetupForm() {
   const [error, setError] = useState<string | null>(null);
