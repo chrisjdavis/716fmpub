@@ -27,6 +27,7 @@ Related server work that is not an HTTP route but drives the same SQL patterns: 
 | `/api/analytics/window-total` | GET | **Canonical SQL only** — `readCachedCanonicalDashboardListenSummary` → `total_scrobbles` (+ read-cache telemetry). Does **not** read `dashboard_bundle_v1`. | Minimal JSON; Core-safe tape counts without snapshot row. | No bundle warm-enqueue; same bounded TTL read-cache family as summary fallback SQL. |
 | `/api/analytics/recent-listens` | GET | **Medium.** Single large `SELECT` with joins (same family as archive/recent in `packages/db/src/dashboardAnalytics.ts`). | Default limit 50, max 100; returns display-oriented columns (cover URL, MBID)—appropriate for UI but wide rows. | None beyond query latency. |
 | `/api/analytics/archive-listens` | GET | **Medium–high.** Keyset page over canonical listens with optional `ILIKE`-style substring filters and `import_jobs` join for provenance (`getArchiveListensPage`). Cost scales with library size and `q` selectivity. | Capped at 100 rows per request (good). | Client-driven pagination only; worst case many sequential pages (UX pattern, not a single-request bug). |
+| `/api/public/analytics/*` | GET | Same SQL families as the private archive/window/summary routes when `listening_history_public` is on; **404** otherwise. Read-only (no recompute enqueue). | Same caps/sanitization as private counterparts. | Edge allowlisted; sole-owner resolved server-side. |
 
 **Redundant calculations (cross-route):** If the UI (or future features) calls `summary` and `recent-listens` separately without a fresh bundle, both scan overlapping listen windows with similar joins. Prefer a single bundle read or server-composed responses when both are needed for the same view.
 
@@ -173,4 +174,7 @@ The following list is consumed by `apps/web/src/server/api/api-route-audit-doc-c
 /api/onboarding/lastfm/configure
 /api/onboarding/lastfm/validate
 /api/onboarding/state
+/api/public/analytics/archive-listens
+/api/public/analytics/summary
+/api/public/analytics/window-total
 -->

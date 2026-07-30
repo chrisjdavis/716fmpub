@@ -316,9 +316,11 @@ export {
 } from "./userWindowSignalsRecompute.js";
 
 export {
+  getSoleOwnerPublicListeningAccess,
   getUserLastfmApiKey,
   getUserProfileFields,
   updateUserProfileFields,
+  type SoleOwnerPublicListeningAccess,
   type UserProfileFields,
   type UserProfileUpdateInput,
 } from "./userProfile.js";

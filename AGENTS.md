@@ -1,4 +1,4 @@
-# Agent notes (716fmpub)
+# Agent notes (716FM)
 
 - This is the **open-source single-user** edition: one owner via `/setup`, no signup/admin/invites, all features unlocked.
 - Prefer small, scoped changes; keep SQL migrations explicit under `packages/db/migrations/`.

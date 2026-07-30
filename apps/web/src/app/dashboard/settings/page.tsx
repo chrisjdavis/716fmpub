@@ -30,6 +30,7 @@ export default async function SettingsPage() {
     lastfmUsername: sanitizeUserFacingPlainText(profile?.lastfm_username ?? ""),
     hasLastfmApiKey: profile?.has_lastfm_api_key ?? false,
     statsTimezone: profile?.stats_timezone ?? null,
+    listeningHistoryPublic: profile?.listening_history_public ?? false,
   };
 
   return (
@@ -40,13 +41,13 @@ export default async function SettingsPage() {
             <p className="font-mono text-label uppercase tracking-[0.1em] text-overline">Settings</p>
             <h1 className="font-display text-display-md text-display">Control center</h1>
             <p className="font-sans text-body text-muted">
-              How we handle your account, exports, and deletion is summarized in{" "}
+              How we handle your account, exports, and deletion is summarized in the{" "}
               <Link
-                href="/covenant"
+                href="/privacy"
                 className="text-interactive underline-offset-2 hover:underline"
                 prefetch={false}
               >
-                The Covenant
+                Privacy policy
               </Link>
               .
             </p>

@@ -28,7 +28,7 @@ export {
   resolveExportArtifactAbsolutePath,
 } from "./exportArtifactPaths.js";
 
-export const PRODUCT_NAME = "716fmpub" as const;
+export const PRODUCT_NAME = "716FM" as const;
 
 export { AUTH_SESSION_COOKIE_NAME } from "./authSessionCookieName.js";
 export { AUTH_CSRF_COOKIE_NAME } from "./authCsrfCookieName.js";

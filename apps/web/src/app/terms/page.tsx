@@ -179,11 +179,7 @@ export default function TermsPage() {
         </section>
 
         <p className="m-0 py-10 font-mono text-caption uppercase tracking-[0.06em] text-muted">
-          Our plain-language privacy commitments are summarized on{" "}
-          <Link href="/covenant" className="text-interactive no-underline hover:underline">
-            The 716FM Covenant
-          </Link>
-          . Detailed practices are described in our{" "}
+          Detailed practices are described in our{" "}
           <Link href="/privacy" className="text-interactive no-underline hover:underline">
             Privacy policy
           </Link>

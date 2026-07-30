@@ -12,12 +12,6 @@ export function AppFooter() {
       role="contentinfo"
     >
       <p className="m-0 flex flex-wrap items-center justify-center gap-x-2 gap-y-2">
-        <Link href="/covenant" className={footerLinkClass}>
-          The 716FM Covenant
-        </Link>
-        <span className="text-faint" aria-hidden>
-          ·
-        </span>
         <Link href="/login" className={footerLinkClass}>
           Sign in
         </Link>

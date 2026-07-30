@@ -40,6 +40,18 @@ describe("sessionCookieGateResponse", () => {
     ).toBeNull();
   });
 
+  it("allows public listening analytics routes without a cookie", () => {
+    expect(
+      sessionCookieGateResponse(req("http://localhost/api/public/analytics/archive-listens")),
+    ).toBeNull();
+    expect(
+      sessionCookieGateResponse(req("http://localhost/api/public/analytics/window-total")),
+    ).toBeNull();
+    expect(
+      sessionCookieGateResponse(req("http://localhost/api/public/analytics/summary")),
+    ).toBeNull();
+  });
+
   it("allows internal API routes without a session cookie", () => {
     expect(
       sessionCookieGateResponse(

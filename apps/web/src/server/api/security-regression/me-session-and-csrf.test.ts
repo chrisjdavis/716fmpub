@@ -73,6 +73,8 @@ describe("Security regression: /api/me session gate and CSRF", () => {
       display_name: "Ada",
       lastfm_username: "lf",
       has_lastfm_api_key: false,
+      stats_timezone: null,
+      listening_history_public: false,
     });
     hoistedDb.updateUserProfileFields.mockResolvedValue(undefined);
   });

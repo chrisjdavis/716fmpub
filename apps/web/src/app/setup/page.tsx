@@ -5,6 +5,7 @@ import {
   signupAccessPageHeaderClassName,
   signupAuthPageStackClassName,
 } from "@/app/access-layout";
+import { PublicListeningAuthNavPrefix } from "@/components/public-site-header-nav";
 import { isInstanceConfigured } from "@/server/instance-configured";
 import { SetupForm } from "./setup-form";
 
@@ -21,12 +22,13 @@ export default async function SetupPage() {
             <p className="font-mono text-label uppercase tracking-[0.08em] text-overline">
               Access
             </p>
-            <h1 className="font-display text-display-md text-display">Set up 716fmpub</h1>
+            <h1 className="font-display text-display-md text-display">Set up 716FM</h1>
             <p className="font-sans text-body text-muted">
               Create the owner account for this self-hosted instance. Only one account is allowed.
             </p>
           </div>
           <nav className="font-mono text-caption uppercase tracking-[0.06em] text-muted">
+            <PublicListeningAuthNavPrefix />
             <Link href="/" className="text-interactive no-underline hover:underline">
               Home
             </Link>

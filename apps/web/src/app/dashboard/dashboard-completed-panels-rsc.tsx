@@ -24,11 +24,18 @@ export async function DashboardCompletedPanelsRsc({
   searchParams,
   job,
   allowAiLayer1Reads,
+  explorePath = "/dashboard/explore",
+  archivePath = "/dashboard/archive",
+  skipStatsFoundationJobs = false,
 }: Readonly<{
   userId: string;
   searchParams: Promise<{ month?: string | string[]; range?: string | string[]; view?: string | string[] }>;
   job: ImportJobApiRow;
   allowAiLayer1Reads: boolean;
+  explorePath?: string;
+  archivePath?: string;
+  /** When true, do not enqueue stats foundation jobs (public guest reads). */
+  skipStatsFoundationJobs?: boolean;
 }>) {
   const env = loadServerEnv();
   const pool = getPool(env);
@@ -38,10 +45,12 @@ export async function DashboardCompletedPanelsRsc({
 
   if (viewRaw !== undefined && String(viewRaw).trim() !== "" && String(viewRaw).trim() !== "new-music") {
     const m = parseTimeMachineMonthYyyMm(monthParam ?? null);
-    redirect(m === null ? "/dashboard/explore" : `/dashboard/explore?month=${encodeURIComponent(m)}`);
+    redirect(m === null ? explorePath : `${explorePath}?month=${encodeURIComponent(m)}`);
   }
 
-  const { statsFoundationPending } = await ensureUserStatsFoundationJobsIfNeeded(pool, env, userId);
+  const { statsFoundationPending } = skipStatsFoundationJobs
+    ? { statsFoundationPending: false }
+    : await ensureUserStatsFoundationJobsIfNeeded(pool, env, userId);
   if (!allowAiLayer1Reads) {
     return <DashboardExploreAdvancedGate statsFoundationPending={statsFoundationPending} />;
   }
@@ -52,6 +61,7 @@ export async function DashboardCompletedPanelsRsc({
     viewParam: viewRaw,
     job,
     allowAiLayer1Reads,
+    archivePath,
   });
 
   if (!model) {
@@ -64,13 +74,13 @@ export async function DashboardCompletedPanelsRsc({
 
   const viewTrim = String(viewRaw ?? "").trim();
   if (viewTrim === "new-music" && model.timelineView !== "new-music") {
-    redirect(`/dashboard/explore?month=${encodeURIComponent(model.monthYyyMm)}`);
+    redirect(`${explorePath}?month=${encodeURIComponent(model.monthYyyMm)}`);
   }
   if (model.timelineView === "new-music") {
     const monthOk = parseTimeMachineMonthYyyMm(monthParam ?? null) === model.monthYyyMm;
     if (viewTrim !== "new-music" || !monthOk) {
       redirect(
-        `/dashboard/explore?month=${encodeURIComponent(model.monthYyyMm)}&view=${encodeURIComponent("new-music")}`,
+        `${explorePath}?month=${encodeURIComponent(model.monthYyyMm)}&view=${encodeURIComponent("new-music")}`,
       );
     }
   }
@@ -79,6 +89,8 @@ export async function DashboardCompletedPanelsRsc({
     <DashboardTimeMachineExplore
       model={model}
       statsFoundationPending={statsFoundationPending}
+      explorePath={explorePath}
+      archivePath={archivePath}
     />
   );
 }

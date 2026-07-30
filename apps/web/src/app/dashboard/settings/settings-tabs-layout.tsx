@@ -8,6 +8,7 @@ import { SettingsListenDataReset } from "./settings-listen-data-reset";
 import {
   SettingsAccountProfileForm,
   SettingsDataSourcesProfileForm,
+  SettingsListeningHistoryPublicForm,
   SettingsProfileMessages,
   SettingsProfileProvider,
   type SettingsProfileInitial,
@@ -186,6 +187,7 @@ export function SettingsTabsLayout({
             <SettingsEmailChange currentEmail={currentEmail} emailVerified={emailVerified} />
           </div>
           <SettingsAccountProfileForm />
+          <SettingsListeningHistoryPublicForm />
         </div>
 
         <div
@@ -228,13 +230,13 @@ export function SettingsTabsLayout({
             Export
           </h2>
           <p className="font-sans text-body text-muted">
-            JSON, CSV, and filtered exports. For retention and portability, see{" "}
+            JSON, CSV, and filtered exports. For retention and portability, see the{" "}
             <Link
-              href="/covenant"
+              href="/privacy"
               className="text-interactive underline-offset-2 hover:underline"
               prefetch={false}
             >
-              The Covenant
+              Privacy policy
             </Link>
             .
           </p>
@@ -257,13 +259,13 @@ export function SettingsTabsLayout({
             Deletion
           </h2>
           <p className="font-sans text-body text-muted">
-            Permanent removal of listen and import data is described in{" "}
+            Permanent removal of listen and import data is described in the{" "}
             <Link
-              href="/covenant"
+              href="/privacy"
               className="text-interactive underline-offset-2 hover:underline"
               prefetch={false}
             >
-              The Covenant
+              Privacy policy
             </Link>
             . Account login is not removed by the reset below.
           </p>

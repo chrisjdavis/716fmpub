@@ -1,13 +1,12 @@
-# 716fmpub
+# 716FM
 
 Open-source, **single-user** Last.fm listening analytics. Self-host your archive: import scrobbles, explore stats, export data. All product features are unlocked — no plans, invites, or admin console.
-
-This is the community edition derived from [716FM](https://github.com/chrisjdavis/716FM). It is not a multi-tenant SaaS product.
 
 ## Features
 
 - Last.fm full history import and incremental sync
 - Dashboard, archive, Musical Time Machine explore, and listen exports
+- Optional public Explore/Archive (`/explore`, `/archive`) when enabled in Settings
 - Layer 1 listening evidence / insights (unlocked)
 - One local owner account via first-run `/setup`
 

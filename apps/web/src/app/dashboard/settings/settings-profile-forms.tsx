@@ -19,6 +19,7 @@ export type SettingsProfileInitial = Readonly<{
   lastfmUsername: string;
   hasLastfmApiKey: boolean;
   statsTimezone: string | null;
+  listeningHistoryPublic: boolean;
 }>;
 
 type FieldErrors = {
@@ -40,11 +41,14 @@ type ProfileContextValue = Readonly<{
   setRemoveLastfmApiKey: (v: boolean) => void;
   statsTimezone: string;
   setStatsTimezone: (v: string) => void;
+  listeningHistoryPublic: boolean;
+  setListeningHistoryPublic: (v: boolean) => void;
   fieldErrors: FieldErrors | null;
   formError: string | null;
   status: string | null;
   pending: boolean;
   submit: () => Promise<void>;
+  submitListeningHistoryPublic: (next: boolean) => Promise<void>;
 }>;
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
@@ -69,6 +73,9 @@ export function SettingsProfileProvider({
   const [statsTimezone, setStatsTimezone] = useState(
     initial.statsTimezone === null ? "" : initial.statsTimezone,
   );
+  const [listeningHistoryPublic, setListeningHistoryPublic] = useState(
+    initial.listeningHistoryPublic,
+  );
   const [fieldErrors, setFieldErrors] = useState<FieldErrors | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
@@ -79,7 +86,14 @@ export function SettingsProfileProvider({
     setLastfmUsername(initial.lastfmUsername);
     setHasLastfmApiKey(initial.hasLastfmApiKey);
     setStatsTimezone(initial.statsTimezone === null ? "" : initial.statsTimezone);
-  }, [initial.displayName, initial.lastfmUsername, initial.hasLastfmApiKey, initial.statsTimezone]);
+    setListeningHistoryPublic(initial.listeningHistoryPublic);
+  }, [
+    initial.displayName,
+    initial.lastfmUsername,
+    initial.hasLastfmApiKey,
+    initial.statsTimezone,
+    initial.listeningHistoryPublic,
+  ]);
 
   const submit = useCallback(async () => {
     setFieldErrors(null);
@@ -90,6 +104,7 @@ export function SettingsProfileProvider({
       displayName,
       lastfmUsername,
       statsTimezone: statsTimezone.trim() === "" ? null : statsTimezone.trim(),
+      listeningHistoryPublic,
     };
     if (removeLastfmApiKey) {
       body.lastfmApiKey = null;
@@ -194,6 +209,9 @@ export function SettingsProfileProvider({
         } else if (u.statsTimezone === null) {
           setStatsTimezone("");
         }
+        if (typeof u.listeningHistoryPublic === "boolean") {
+          setListeningHistoryPublic(u.listeningHistoryPublic);
+        }
       }
     } catch {
       /* ignore */
@@ -204,7 +222,58 @@ export function SettingsProfileProvider({
     lastfmApiKeyInput,
     removeLastfmApiKey,
     statsTimezone,
+    listeningHistoryPublic,
   ]);
+
+  const submitListeningHistoryPublic = useCallback(
+    async (next: boolean) => {
+      setFieldErrors(null);
+      setFormError(null);
+      setStatus(null);
+      setPending(true);
+      const csrf = await browserCsrfHeaderRecord();
+      if (!csrf) {
+        setPending(false);
+        setFormError("Could not prepare a secure request. Refresh the page and try again.");
+        return;
+      }
+      const previous = listeningHistoryPublic;
+      setListeningHistoryPublic(next);
+      const res = await fetch("/api/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...csrf },
+        credentials: "include",
+        body: JSON.stringify({
+          displayName,
+          lastfmUsername,
+          listeningHistoryPublic: next,
+        }),
+      });
+      setPending(false);
+      if (!res.ok) {
+        setListeningHistoryPublic(previous);
+        let message = `[ERROR: HTTP ${res.status}]`;
+        try {
+          const resBody: unknown = await res.json();
+          if (
+            resBody &&
+            typeof resBody === "object" &&
+            typeof (resBody as { error?: unknown }).error === "string"
+          ) {
+            message = (resBody as { error: string }).error;
+          }
+        } catch {
+          /* ignore */
+        }
+        setFormError(sanitizeUserFacingPlainText(message));
+        return;
+      }
+      setStatus(
+        next ? "Explore and Archive are now public." : "Explore and Archive are private again.",
+      );
+    },
+    [displayName, lastfmUsername, listeningHistoryPublic],
+  );
 
   const value = useMemo<ProfileContextValue>(
     () => ({
@@ -219,11 +288,14 @@ export function SettingsProfileProvider({
       setRemoveLastfmApiKey,
       statsTimezone,
       setStatsTimezone,
+      listeningHistoryPublic,
+      setListeningHistoryPublic,
       fieldErrors,
       formError,
       status,
       pending,
       submit,
+      submitListeningHistoryPublic,
     }),
     [
       displayName,
@@ -232,11 +304,13 @@ export function SettingsProfileProvider({
       lastfmApiKeyInput,
       removeLastfmApiKey,
       statsTimezone,
+      listeningHistoryPublic,
       fieldErrors,
       formError,
       status,
       pending,
       submit,
+      submitListeningHistoryPublic,
     ],
   );
 
@@ -305,6 +379,48 @@ export function SettingsAccountProfileForm() {
         {pending ? "[SAVING…]" : "Save display name"}
       </button>
     </form>
+  );
+}
+
+export function SettingsListeningHistoryPublicForm() {
+  const {
+    listeningHistoryPublic,
+    submitListeningHistoryPublic,
+    pending,
+  } = useSettingsProfile();
+
+  return (
+    <div className="space-y-4 border-t border-hairline pt-8">
+      <h3 className="font-mono text-label uppercase tracking-[0.1em] text-overline">
+        Public listening history
+      </h3>
+      <p className="font-sans text-body text-muted">
+        When enabled, anyone with the URL can open Explore and Archive on this instance — including
+        play counts, timelines, and listen rows. Home, imports, exports, and settings stay private.
+        Default is off.
+      </p>
+      <label className="flex cursor-pointer items-start gap-3 font-sans text-body text-foreground">
+        <input
+          type="checkbox"
+          className="mt-1 border border-hairline"
+          checked={listeningHistoryPublic}
+          disabled={pending}
+          onChange={(ev) => {
+            void submitListeningHistoryPublic(ev.target.checked);
+          }}
+        />
+        <span>
+          Make Explore and Archive public at{" "}
+          <span className="font-mono text-caption normal-case tracking-normal">/explore</span> and{" "}
+          <span className="font-mono text-caption normal-case tracking-normal">/archive</span>
+        </span>
+      </label>
+      {listeningHistoryPublic ? (
+        <p className="font-mono text-caption uppercase tracking-[0.04em] text-muted">
+          Public links: /explore · /archive
+        </p>
+      ) : null}
+    </div>
   );
 }
 

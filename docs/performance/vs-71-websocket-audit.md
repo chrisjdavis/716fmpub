@@ -50,7 +50,7 @@ Nothing identified as **safe to remove** without replacing invalidation; the mai
 
 | Priority | Item | Action |
 | --- | --- | --- |
-| P0 | NOTIFY storm on bulk `listens` writes | **Addressed (716fmpub):** statement-level triggers notify once per distinct `user_id` per statement (`1744560000044_listens-notify-statement-coalesce.cjs`); realtime bridge also coalesces fan-out (~75 ms trailing / 400 ms max wait). |
+| P0 | NOTIFY storm on bulk `listens` writes | **Addressed (716FM):** statement-level triggers notify once per distinct `user_id` per statement (`1744560000044_listens-notify-statement-coalesce.cjs`); realtime bridge also coalesces fan-out (~75 ms trailing / 400 ms max wait). |
 | P1 | `router.refresh()` cost per event | After coalescing NOTIFYs, **batch invalidation** so one user-visible refresh covers many rows; optionally narrow refresh scope if Next.js patterns allow partial revalidation without full route refresh (product decision). |
 | P2 | `vs_event_id` size | If wire bytes matter at extreme scale, replace UUID with shorter opaque ids **only** if observability still correlates server-side (log both). |
 | P3 | Handshake JSON | Keep `{ enabled, wsUrl, token }`; avoid adding optional fields clients must parse on every dashboard load. |

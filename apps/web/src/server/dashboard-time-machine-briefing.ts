@@ -953,6 +953,7 @@ export function buildTimeMachineExploreCopy(input: Readonly<{
     topTracks: readonly TimeMachineExploreAnchorTrackRow[];
     topAlbums: readonly TimeMachineExploreAnchorAlbumRow[];
   }> | null;
+  archivePath?: string;
 }>): TimeMachineExploreCopy {
   const {
     monthYyyMm,
@@ -965,6 +966,7 @@ export function buildTimeMachineExploreCopy(input: Readonly<{
     timeline = [],
     nextMonth = null,
     exploreCharts = null,
+    archivePath = "/dashboard/archive",
   } = input;
   const periodLabel = formatUtcMonthLong(monthYyyMm);
 
@@ -1098,6 +1100,7 @@ export function buildTimeMachineExploreCopy(input: Readonly<{
     topTrack,
     topAlbumTitle,
     newArtistHeadline: rankedHeadNew,
+    archivePath,
   });
 
   const hasCharts =

@@ -5,6 +5,7 @@ import {
   signupAuthPageStackClassName,
   signupFormShellClassName,
 } from "@/app/access-layout";
+import { PublicListeningAuthNavPrefix } from "@/components/public-site-header-nav";
 import { VerifyEmailClient } from "./verify-email-client";
 
 export default async function VerifyEmailPage({
@@ -24,6 +25,7 @@ export default async function VerifyEmailPage({
             <h1 className="font-display text-display-md text-display">Confirm email</h1>
           </div>
           <nav className="font-mono text-caption uppercase tracking-[0.06em] text-muted">
+            <PublicListeningAuthNavPrefix />
             <Link href="/" className="text-interactive no-underline hover:underline">
               Home
             </Link>

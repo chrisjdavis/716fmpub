@@ -49,6 +49,7 @@ function meJsonUser(input: {
   lastfmUsername: string | null;
   hasLastfmApiKey: boolean;
   statsTimezone: string | null;
+  listeningHistoryPublic: boolean;
 }) {
   return {
     user: {
@@ -64,6 +65,7 @@ function meJsonUser(input: {
       hasLastfmApiKey: input.hasLastfmApiKey,
       statsTimezone:
         input.statsTimezone === null ? null : sanitizeUserFacingPlainText(input.statsTimezone),
+      listeningHistoryPublic: input.listeningHistoryPublic,
     },
   };
 }
@@ -168,6 +170,7 @@ export async function GET(req: Request): Promise<Response> {
         lastfmUsername: profile?.lastfm_username ?? null,
         hasLastfmApiKey: profile?.has_lastfm_api_key ?? false,
         statsTimezone: profile?.stats_timezone ?? null,
+        listeningHistoryPublic: profile?.listening_history_public ?? false,
       }),
     );
   });
@@ -200,6 +203,9 @@ export async function PATCH(req: Request): Promise<Response> {
       ...(parsed.data.statsTimezone !== undefined
         ? { statsTimezone: parsed.data.statsTimezone }
         : {}),
+      ...(parsed.data.listeningHistoryPublic !== undefined
+        ? { listeningHistoryPublic: parsed.data.listeningHistoryPublic }
+        : {}),
     };
     await updateUserProfileFields(pool, user.id, profilePatch);
     if (parsed.data.statsTimezone !== undefined) {
@@ -217,13 +223,20 @@ export async function PATCH(req: Request): Promise<Response> {
       invalidateListeningHistoryDerivedReadCaches(user.id);
     }
     const changedFields: Array<
-      "displayName" | "lastfmUsername" | "lastfmApiKey" | "statsTimezone"
+      | "displayName"
+      | "lastfmUsername"
+      | "lastfmApiKey"
+      | "statsTimezone"
+      | "listeningHistoryPublic"
     > = ["displayName", "lastfmUsername"];
     if (parsed.data.lastfmApiKey !== undefined) {
       changedFields.push("lastfmApiKey");
     }
     if (parsed.data.statsTimezone !== undefined) {
       changedFields.push("statsTimezone");
+    }
+    if (parsed.data.listeningHistoryPublic !== undefined) {
+      changedFields.push("listeningHistoryPublic");
     }
     await tryInsertSecurityAuditEvent(pool, {
       actorUserId: user.id,
@@ -242,6 +255,7 @@ export async function PATCH(req: Request): Promise<Response> {
         lastfmUsername: profileAfter?.lastfm_username ?? null,
         hasLastfmApiKey: profileAfter?.has_lastfm_api_key ?? false,
         statsTimezone: profileAfter?.stats_timezone ?? null,
+        listeningHistoryPublic: profileAfter?.listening_history_public ?? false,
       }),
     );
   });

@@ -2,7 +2,7 @@
 
 This note is the canonical description of how production auth works **in this repository today**. Implementation lives primarily under `apps/web` (Next.js App Router), `apps/worker`, `apps/realtime`, and `packages/env`.
 
-**Product model (716fmpub):** open-source **single-user** self-host. One owner is created via **`/setup`** (`POST /api/auth/setup`). There is **no** public signup, admin console, or multi-tenant invite flow.
+**Product model (716FM):** open-source **single-user** self-host. One owner is created via **`/setup`** (`POST /api/auth/setup`). There is **no** public signup, admin console, or multi-tenant invite flow.
 
 ## Authentication model
 
@@ -45,6 +45,7 @@ This note is the canonical description of how production auth works **in this re
 | Imports | `GET` / `POST /api/imports`, … | `requireSession` + **CSRF** on `POST`. |
 | Exports | `POST /api/export/listens`, … | `requireSession` + **CSRF** on `POST`; download needs session + delivery token. |
 | Analytics / dashboard API | `GET /api/analytics/*`, fingerprint, realtime handshake | `requireSession`. |
+| Public listening (opt-in) | `GET /api/public/analytics/{archive-listens,window-total,summary}` | Edge allowlist; handler requires sole owner + `listening_history_public`. No session. |
 | Internal HTTP | `/api/internal/*` | Bearer `VS_INTERNAL_API_SECRET`; **`503`** when unset. |
 
 **Background work:** Import/export/listen-sync/analytics jobs run in **`apps/worker`** (BullMQ) after the web API enqueues with a session-bound `userId`.
@@ -58,10 +59,13 @@ This note is the canonical description of how production auth works **in this re
 - `POST /api/auth/logout`
 - `POST /api/auth/recovery/request` and `POST /api/auth/recovery/confirm`
 - `POST /api/auth/verify-email` and `POST /api/auth/verify-email-change`
+- `GET /api/public/analytics/archive-listens`, `GET /api/public/analytics/window-total`, `GET /api/public/analytics/summary` (only when the sole owner has enabled `listening_history_public`; otherwise handlers return **404**)
 
 There is **no** `/api/auth/signup` or `/api/admin/*` in this edition.
 
 **Authenticated — session required:** `/api/me*`, `/api/imports*`, `/api/export/*`, `/api/analytics/*`, onboarding routes.
+
+**Public HTML (opt-in):** `/explore` and `/archive` render when `users.listening_history_public` is true for the sole owner. They reuse Explore/Archive UI without dashboard chrome (no imports, exports, settings, or fingerprint polling). When the flag is off, those pages show a soft “not published” state instead of redirecting to login.
 
 **Internal-only — Bearer `VS_INTERNAL_API_SECRET`:** `/api/internal/*`.
 

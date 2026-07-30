@@ -24,11 +24,7 @@ export default async function PrivacyPage() {
         <p className="font-sans text-body text-muted">
           Effective {effectiveDate}. This policy describes how 716 Ventures, LLC (&quot;we,&quot;
           &quot;us,&quot; or &quot;our&quot;) handles information when you use {PRODUCT_NAME} (the
-          &quot;Service&quot;). It supplements our plain-language{" "}
-          <Link href="/covenant" className="text-interactive no-underline hover:underline">
-            Covenant
-          </Link>
-          ; where they differ on specifics, this policy controls for legal precision.
+          &quot;Service&quot;).
         </p>
       </header>
 
@@ -181,13 +177,6 @@ export default async function PrivacyPage() {
           Related:{" "}
           <Link href="/terms" className="text-interactive no-underline hover:underline">
             Terms of use
-          </Link>
-          <span className="text-faint" aria-hidden>
-            {" "}
-            ·{" "}
-          </span>
-          <Link href="/covenant" className="text-interactive no-underline hover:underline">
-            The 716FM Covenant
           </Link>
         </p>
       </article>

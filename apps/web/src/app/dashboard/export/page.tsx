@@ -153,9 +153,9 @@ export default async function ExportPage() {
               </ul>
               <p className="mt-5 w-full min-w-0 border-t border-hairline pt-5 font-sans text-sm leading-relaxed text-muted md:text-base">
                 How we handle your account and listening history — including exports — is summarized
-                in{" "}
-                <Link href="/covenant" className="text-interactive underline-offset-2 hover:underline">
-                  The Covenant
+                in the{" "}
+                <Link href="/privacy" className="text-interactive underline-offset-2 hover:underline">
+                  Privacy policy
                 </Link>
                 .
               </p>

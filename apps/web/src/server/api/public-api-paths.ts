@@ -10,6 +10,9 @@ export const PUBLIC_API_ROUTE_SEGMENTS = [
   "auth/recovery/confirm",
   "auth/verify-email",
   "auth/verify-email-change",
+  "public/analytics/archive-listens",
+  "public/analytics/window-total",
+  "public/analytics/summary",
 ] as const;
 
 /**

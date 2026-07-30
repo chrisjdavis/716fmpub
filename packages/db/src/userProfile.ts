@@ -14,6 +14,8 @@ export type UserProfileFields = Readonly<{
   has_lastfm_api_key: boolean;
   /** IANA timezone for stats day boundaries; null = infer from edge headers or UTC. */
   stats_timezone: string | null;
+  /** When true, Explore and Archive are readable without a session on this instance. */
+  listening_history_public: boolean;
 }>;
 
 /**
@@ -54,13 +56,61 @@ export async function getUserProfileFields(
   const { rows } = await db.query<UserProfileFields>(
     `select display_name, lastfm_username,
             (lastfm_api_key is not null) as has_lastfm_api_key,
-            stats_timezone
+            stats_timezone,
+            listening_history_public
      from users
      where id = $1::uuid
      limit 1`,
     [userId],
   );
   return rows[0] ?? null;
+}
+
+export type SoleOwnerPublicListeningAccess = Readonly<{
+  userId: string;
+  display_name: string | null;
+  stats_timezone: string | null;
+  product_plan: string;
+}>;
+
+/**
+ * Resolves the sole owner when `listening_history_public` is enabled.
+ * Returns null when the instance has no owner, more than one user, or the flag is off.
+ * Never accepts a client-supplied user id.
+ */
+export async function getSoleOwnerPublicListeningAccess(
+  db: Db,
+): Promise<SoleOwnerPublicListeningAccess | null> {
+  const { rows } = await db.query<{
+    id: string;
+    display_name: string | null;
+    stats_timezone: string | null;
+    product_plan: string;
+    listening_history_public: boolean;
+    user_count: string;
+  }>(
+    `select id, display_name, stats_timezone, product_plan, listening_history_public,
+            (select count(*)::text from users) as user_count
+     from users
+     order by created_at asc
+     limit 1`,
+  );
+  const row = rows[0];
+  if (!row) {
+    return null;
+  }
+  if (Number.parseInt(row.user_count, 10) !== 1) {
+    return null;
+  }
+  if (!row.listening_history_public) {
+    return null;
+  }
+  return {
+    userId: row.id,
+    display_name: row.display_name,
+    stats_timezone: row.stats_timezone,
+    product_plan: row.product_plan,
+  };
 }
 
 /**
@@ -93,6 +143,7 @@ export type UserProfileUpdateInput = Readonly<{
   lastfmUsername?: string | null;
   lastfmApiKey?: string | null;
   statsTimezone?: string | null;
+  listeningHistoryPublic?: boolean;
 }>;
 
 /**
@@ -127,6 +178,10 @@ export async function updateUserProfileFields(
   if ("statsTimezone" in fields) {
     sets.push(`stats_timezone = $${i++}`);
     values.push(fields.statsTimezone);
+  }
+  if ("listeningHistoryPublic" in fields) {
+    sets.push(`listening_history_public = $${i++}`);
+    values.push(fields.listeningHistoryPublic === true);
   }
   if (sets.length === 0) {
     return;

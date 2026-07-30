@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  getSoleOwnerPublicListeningAccess,
   getUserLastfmApiKey,
   getUserProfileFields,
   updateUserProfileFields,
@@ -21,6 +22,7 @@ describe("userProfile repository", () => {
           lastfm_username: "adalast",
           has_lastfm_api_key: true,
           stats_timezone: null,
+          listening_history_public: false,
         },
       ],
     });
@@ -30,6 +32,7 @@ describe("userProfile repository", () => {
       lastfm_username: "adalast",
       has_lastfm_api_key: true,
       stats_timezone: null,
+      listening_history_public: false,
     });
     expect(query).toHaveBeenCalledWith(
       expect.stringContaining("select display_name"),
@@ -41,6 +44,60 @@ describe("userProfile repository", () => {
     query.mockResolvedValueOnce({ rows: [] });
     const out = await getUserProfileFields(db as never, "missing");
     expect(out).toBeNull();
+  });
+
+  it("getSoleOwnerPublicListeningAccess returns owner when flag is on", async () => {
+    query.mockResolvedValueOnce({
+      rows: [
+        {
+          id: "owner-1",
+          display_name: "Ada",
+          stats_timezone: "UTC",
+          product_plan: "advanced",
+          listening_history_public: true,
+          user_count: "1",
+        },
+      ],
+    });
+    const out = await getSoleOwnerPublicListeningAccess(db as never);
+    expect(out).toEqual({
+      userId: "owner-1",
+      display_name: "Ada",
+      stats_timezone: "UTC",
+      product_plan: "advanced",
+    });
+  });
+
+  it("getSoleOwnerPublicListeningAccess returns null when flag is off", async () => {
+    query.mockResolvedValueOnce({
+      rows: [
+        {
+          id: "owner-1",
+          display_name: "Ada",
+          stats_timezone: null,
+          product_plan: "advanced",
+          listening_history_public: false,
+          user_count: "1",
+        },
+      ],
+    });
+    expect(await getSoleOwnerPublicListeningAccess(db as never)).toBeNull();
+  });
+
+  it("getSoleOwnerPublicListeningAccess returns null when not sole owner", async () => {
+    query.mockResolvedValueOnce({
+      rows: [
+        {
+          id: "owner-1",
+          display_name: "Ada",
+          stats_timezone: null,
+          product_plan: "advanced",
+          listening_history_public: true,
+          user_count: "2",
+        },
+      ],
+    });
+    expect(await getSoleOwnerPublicListeningAccess(db as never)).toBeNull();
   });
 
   it("updateUserProfileFields updates both columns when both provided", async () => {
@@ -55,6 +112,14 @@ describe("userProfile repository", () => {
     expect(String(sql)).toContain("updated_at = now()");
     expect(String(sql)).toContain("where id = $3::uuid");
     expect(params).toEqual(["N", "lf", "u1"]);
+  });
+
+  it("updateUserProfileFields can patch listeningHistoryPublic", async () => {
+    query.mockResolvedValueOnce({ rows: [] });
+    await updateUserProfileFields(db as never, "u1", { listeningHistoryPublic: true });
+    const [sql, params] = query.mock.calls[0] ?? [];
+    expect(String(sql)).toContain("listening_history_public = $1");
+    expect(params).toEqual([true, "u1"]);
   });
 
   it("updateUserProfileFields clears with null", async () => {

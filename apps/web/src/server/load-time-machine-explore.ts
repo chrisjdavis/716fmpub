@@ -94,6 +94,7 @@ export async function loadTimeMachineExploreModel(
     viewParam: string | null | undefined;
     job: ImportJobApiRow;
     allowAiLayer1Reads: boolean;
+    archivePath?: string;
   }>,
 ): Promise<TimeMachineExploreModel | null> {
   if (!input.allowAiLayer1Reads) {
@@ -102,6 +103,7 @@ export async function loadTimeMachineExploreModel(
   if (input.job.stage !== "completed") {
     return null;
   }
+  const archivePath = input.archivePath ?? "/dashboard/archive";
 
   const timeline = await listUserTimeMachineMonthDensity(pool, input.userId);
   const wallMonth = utcWallMonthYyyMm(Date.now());
@@ -211,6 +213,7 @@ export async function loadTimeMachineExploreModel(
     timeline,
     nextMonth,
     exploreCharts,
+    archivePath,
   });
 
   const anchorStrip =
@@ -221,6 +224,7 @@ export async function loadTimeMachineExploreModel(
           topTracks: anchorTracks,
           topAlbums: anchorAlbums,
           newArtistsRanked,
+          archivePath,
         })
       : null;
 

@@ -56,6 +56,7 @@ export const meProfilePatchBodySchema = z
       .refine((v) => v === undefined || v === null || isValidIanaTimeZone(v), {
         message: "statsTimezone must be a valid IANA time zone name",
       }),
+    listeningHistoryPublic: z.boolean().optional(),
   })
   .strict();
 

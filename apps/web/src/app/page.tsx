@@ -5,6 +5,7 @@ import { AppBrandMark } from "@/components/app-brand-mark";
 import { getServerSession } from "@/server/auth/get-server-session";
 import { isInstanceConfigured } from "@/server/instance-configured";
 import { AppPrimaryNav } from "@/app/dashboard/app-primary-nav";
+import { PublicHomeTopbarActions } from "@/components/public-site-header-nav";
 import { HomeHowItWorks } from "./home-how-it-works";
 import { HomeLandingScrollReveal } from "./home-landing-scroll-reveal";
 import styles from "./home-landing.module.css";
@@ -59,9 +60,11 @@ export default async function HomePage() {
               <span className={styles.brandName}>{PRODUCT_NAME}</span>
             </Link>
             <div className={styles.specTopbarActions}>
-              <Link href={primaryHref} className={styles.specTopLink}>
-                {primaryLabel}
-              </Link>
+              <PublicHomeTopbarActions
+                primaryHref={primaryHref}
+                primaryLabel={primaryLabel}
+                linkClassName={styles.specTopLink}
+              />
             </div>
           </div>
         )}
@@ -142,14 +145,11 @@ export default async function HomePage() {
       <footer className={`${styles.shellOuter} ${styles.specFooter}`} aria-label="Site links">
         <div className={`${styles.shellInner} ${styles.specFooterInner}`}>
           <nav className={styles.specFooterNav} aria-label="Legal">
-            <Link href="/covenant" className={styles.specFooterLink}>
-              Data & privacy
+            <Link href="/privacy" className={styles.specFooterLink}>
+              Privacy
             </Link>
             <Link href="/terms" className={styles.specFooterLink}>
               Terms
-            </Link>
-            <Link href="/privacy" className={styles.specFooterLink}>
-              Privacy
             </Link>
           </nav>
           <p className={styles.specFooterMeta}>{PRODUCT_NAME}</p>

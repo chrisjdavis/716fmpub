@@ -3,6 +3,7 @@ import { PRODUCT_NAME } from "@vs/domain";
 import homeStyles from "@/app/home-landing.module.css";
 import { AppPrimaryNav } from "@/app/dashboard/app-primary-nav";
 import { AppBrandMark } from "@/components/app-brand-mark";
+import { PublicSiteHeaderNav } from "@/components/public-site-header-nav";
 import { getServerSession } from "@/server/auth/get-server-session";
 
 export async function LegalDocumentChrome({ children }: { children: React.ReactNode }) {
@@ -19,18 +20,7 @@ export async function LegalDocumentChrome({ children }: { children: React.ReactN
             <AppBrandMark />
             <span className={homeStyles.brandName}>{PRODUCT_NAME}</span>
           </Link>
-          {session ? (
-            <AppPrimaryNav />
-          ) : (
-            <nav
-              className="flex shrink-0 flex-wrap items-center justify-end gap-x-4 gap-y-2 font-mono text-caption uppercase tracking-[0.06em] text-muted"
-              aria-label="Site"
-            >
-              <Link href="/login" className="text-interactive no-underline hover:underline">
-                Sign in
-              </Link>
-            </nav>
-          )}
+          {session ? <AppPrimaryNav /> : <PublicSiteHeaderNav variant="compact" />}
         </div>
       </header>
 

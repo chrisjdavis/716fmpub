@@ -16,12 +16,16 @@ const moduleMetaClass = "font-sans text-base leading-[26px] text-muted";
 export function DashboardTimeMachineExplore({
   model,
   statsFoundationPending,
+  explorePath = "/dashboard/explore",
+  archivePath = "/dashboard/archive",
 }: Readonly<{
   model: TimeMachineExploreModel;
   statsFoundationPending: boolean;
+  explorePath?: string;
+  archivePath?: string;
 }>) {
   const { copy, anchorStrip } = model;
-  const archiveHref = `/dashboard/archive?month=${encodeURIComponent(model.monthYyyMm)}`;
+  const archiveHref = `${archivePath}?month=${encodeURIComponent(model.monthYyyMm)}`;
   const hasLowerBody =
     Boolean(exploreNarrativePlainText(copy.primaryNarrative).trim()) ||
     Boolean(exploreNarrativePlainText(copy.comparisonNarrative).trim()) ||
@@ -51,6 +55,7 @@ export function DashboardTimeMachineExplore({
             timeline={model.timeline}
             selectedMonth={model.monthYyyMm}
             timelineView={model.timelineView}
+            explorePath={explorePath}
           />
         </section>
 

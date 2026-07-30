@@ -102,6 +102,18 @@ describe("meProfilePatchBodySchema", () => {
     }
   });
 
+  it("accepts optional listeningHistoryPublic", () => {
+    const out = meProfilePatchBodySchema.safeParse({
+      displayName: "x",
+      lastfmUsername: "u",
+      listeningHistoryPublic: true,
+    });
+    expect(out.success).toBe(true);
+    if (out.success) {
+      expect(out.data.listeningHistoryPublic).toBe(true);
+    }
+  });
+
   it("rejects invalid statsTimezone", () => {
     const out = meProfilePatchBodySchema.safeParse({
       displayName: "x",

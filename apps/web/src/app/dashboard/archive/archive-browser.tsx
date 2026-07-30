@@ -304,6 +304,7 @@ export function ArchiveBrowser({
   initialPageSize,
   initialUtcArchiveMonthYyyMm = null,
   initialAnalyticsRange = "all",
+  analyticsApiBase = "/api/analytics",
 }: Readonly<{
   /** When false, window totals still load; full listen summary (highlights) stays server-gated. */
   allowAiLayer1Reads: boolean;
@@ -325,6 +326,8 @@ export function ArchiveBrowser({
   initialUtcArchiveMonthYyyMm?: string | null;
   /** From `?range=` on first load; rolling window for archive listens (SSR list is still all-time). */
   initialAnalyticsRange?: DashboardAnalyticsRange;
+  /** Base path for archive analytics GETs (`/api/analytics` or `/api/public/analytics`). */
+  analyticsApiBase?: string;
 }>) {
   const displayTimeZone = useDashboardDisplayIanaTimeZone();
   const [utcMonthFilter, setUtcMonthFilter] = useState<string | null>(initialUtcArchiveMonthYyyMm);
@@ -377,8 +380,8 @@ export function ArchiveBrowser({
     }
     let cancelled = false;
     const countUrl = utcMonthFilter
-      ? `/api/analytics/window-total?month=${encodeURIComponent(utcMonthFilter)}`
-      : `/api/analytics/window-total?range=${encodeURIComponent(range)}`;
+      ? `${analyticsApiBase}/window-total?month=${encodeURIComponent(utcMonthFilter)}`
+      : `${analyticsApiBase}/window-total?range=${encodeURIComponent(range)}`;
     void (async () => {
       try {
         const countRes = await fetch(countUrl, { method: "GET", credentials: "same-origin" });
@@ -395,8 +398,8 @@ export function ArchiveBrowser({
           return;
         }
         const summaryUrl = utcMonthFilter
-          ? `/api/analytics/summary?month=${encodeURIComponent(utcMonthFilter)}`
-          : `/api/analytics/summary?range=${encodeURIComponent(range)}`;
+          ? `${analyticsApiBase}/summary?month=${encodeURIComponent(utcMonthFilter)}`
+          : `${analyticsApiBase}/summary?range=${encodeURIComponent(range)}`;
         const res = await fetch(summaryUrl, { method: "GET", credentials: "same-origin" });
         if (!res.ok) {
           return;
@@ -415,7 +418,7 @@ export function ArchiveBrowser({
     return () => {
       cancelled = true;
     };
-  }, [range, utcMonthFilter, allowAiLayer1Reads]);
+  }, [range, utcMonthFilter, allowAiLayer1Reads, analyticsApiBase]);
 
   useEffect(() => {
     const t = window.setTimeout(() => setDebouncedQ(qInput), 300);
@@ -437,7 +440,7 @@ export function ArchiveBrowser({
         opts.cursor,
         utcMonthFilter,
       );
-      const res = await fetch(`/api/analytics/archive-listens?${qs}`, {
+      const res = await fetch(`${analyticsApiBase}/archive-listens?${qs}`, {
         method: "GET",
         credentials: "same-origin",
       });
@@ -457,7 +460,7 @@ export function ArchiveBrowser({
       setHasMore(body.has_more);
       setLoadError(null);
     },
-    [range, source, typeFilter, debouncedQ, initialPageSize, utcMonthFilter],
+    [range, source, typeFilter, debouncedQ, initialPageSize, utcMonthFilter, analyticsApiBase],
   );
 
   useEffect(() => {

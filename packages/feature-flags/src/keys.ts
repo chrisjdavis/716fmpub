@@ -4,7 +4,7 @@
  *
  * - `skipRedisQueues`: when true, `REDIS_URL` is optional and BullMQ producers/workers
  *   stay offline so the web app and worker can run against Postgres only (local dev).
- * - `signupsDisabled`: unused in 716fmpub (no public signup; owner created via `/setup`).
+ * - `signupsDisabled`: unused in 716FM (no public signup; owner created via `/setup`).
  *   Kept for flag-schema compatibility with the commercial edition.
  */
 export const FEATURE_FLAG_KEYS = ["skipRedisQueues", "signupsDisabled"] as const;

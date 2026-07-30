@@ -13,12 +13,13 @@ function sampleMeResponseBody() {
       lastfmUsername: null as string | null,
       hasLastfmApiKey: false,
       statsTimezone: null as string | null,
+      listeningHistoryPublic: false,
     },
   };
 }
 
 describe("VS-42 /api/me public user JSON shape", () => {
-  it("exposes exactly the nine documented user fields (no secrets or key material)", () => {
+  it("exposes exactly the documented user fields (no secrets or key material)", () => {
     const keys = Object.keys(sampleMeResponseBody().user).sort();
     expect(keys).toEqual(
       [
@@ -29,6 +30,7 @@ describe("VS-42 /api/me public user JSON shape", () => {
         "hasLastfmApiKey",
         "id",
         "lastfmUsername",
+        "listeningHistoryPublic",
         "productPlan",
         "statsTimezone",
       ].sort(),

@@ -99,11 +99,15 @@ describe("PATCH /api/me — listening-history read cache", () => {
         display_name: "Ada",
         lastfm_username: "olduser",
         has_lastfm_api_key: false,
+        stats_timezone: null,
+        listening_history_public: false,
       })
       .mockResolvedValueOnce({
         display_name: "Ada",
         lastfm_username: "newuser",
         has_lastfm_api_key: false,
+        stats_timezone: null,
+        listening_history_public: false,
       });
 
     const res = await PATCH(
@@ -123,11 +127,15 @@ describe("PATCH /api/me — listening-history read cache", () => {
         display_name: "Ada",
         lastfm_username: "same",
         has_lastfm_api_key: false,
+        stats_timezone: null,
+        listening_history_public: false,
       })
       .mockResolvedValueOnce({
         display_name: "Ada II",
         lastfm_username: "same",
         has_lastfm_api_key: false,
+        stats_timezone: null,
+        listening_history_public: false,
       });
 
     const res = await PATCH(

@@ -15,7 +15,6 @@ const MORE_NAV: readonly { href: string; label: string }[] = [
   { href: "/dashboard/imports", label: "Import" },
   { href: "/dashboard/export", label: "Export" },
   { href: "/dashboard/settings", label: "Settings" },
-  { href: "/covenant", label: "Covenant" },
 ];
 
 /** Shared motion for top-rail links (respects `prefers-reduced-motion`). */

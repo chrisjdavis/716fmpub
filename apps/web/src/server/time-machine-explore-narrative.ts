@@ -105,9 +105,11 @@ export function entityCandidatesForExploreMonth(input: Readonly<{
   topTrack: string | null;
   topAlbumTitle: string | null;
   newArtistHeadline: string | null;
+  archivePath?: string;
 }>): readonly EntityCandidate[] {
   const { monthYyyMm, topArtist, topTrack, topAlbumTitle, newArtistHeadline } = input;
-  const archiveHref = `/dashboard/archive?month=${encodeURIComponent(monthYyyMm)}`;
+  const archiveBase = input.archivePath ?? "/dashboard/archive";
+  const archiveHref = `${archiveBase}?month=${encodeURIComponent(monthYyyMm)}`;
   const out: EntityCandidate[] = [];
   if (topTrack) {
     out.push({ label: topTrack, kind: "track", href: archiveHref });

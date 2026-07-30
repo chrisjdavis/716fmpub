@@ -34,33 +34,35 @@ function stripDedupeKey(item: Readonly<{ imageUrl: string | null | undefined; al
   return `a:${item.albumId ?? "x"}:t:${item.trackId}`;
 }
 
-function archiveHrefForMonth(monthYyyMm: string): string {
-  return `/dashboard/archive?month=${encodeURIComponent(monthYyyMm)}`;
+function archiveHrefForMonth(monthYyyMm: string, archivePath = "/dashboard/archive"): string {
+  return `${archivePath}?month=${encodeURIComponent(monthYyyMm)}`;
 }
 
 function trackToStripItem(
   row: TimeMachineExploreAnchorTrackRow,
   monthYyyMm: string,
+  archivePath: string,
 ): TimeMachineExploreAnchorStripItem {
   return {
     kind: "track",
     title: row.title,
     subtitle: row.artist_name,
     imageUrl: row.lastfm_cover_image_url,
-    archiveHref: archiveHrefForMonth(monthYyyMm),
+    archiveHref: archiveHrefForMonth(monthYyyMm, archivePath),
   };
 }
 
 function albumToStripItem(
   row: TimeMachineExploreAnchorAlbumRow,
   monthYyyMm: string,
+  archivePath: string,
 ): TimeMachineExploreAnchorStripItem {
   return {
     kind: "album",
     title: row.title,
     subtitle: row.artist_name,
     imageUrl: row.lastfm_cover_image_url,
-    archiveHref: archiveHrefForMonth(monthYyyMm),
+    archiveHref: archiveHrefForMonth(monthYyyMm, archivePath),
   };
 }
 
@@ -74,8 +76,10 @@ export function buildTimeMachineExploreAnchorStrip(input: Readonly<{
   topTracks: readonly TimeMachineExploreAnchorTrackRow[];
   topAlbums: readonly TimeMachineExploreAnchorAlbumRow[];
   newArtistsRanked: readonly { name: string; playsInPeriod: number }[];
+  archivePath?: string;
 }>): TimeMachineExploreAnchorStrip | null {
   const { monthYyyMm, metrics, topTracks, topAlbums, newArtistsRanked } = input;
+  const archivePath = input.archivePath ?? "/dashboard/archive";
   if (metrics.play_count < 1) {
     return null;
   }
@@ -95,7 +99,7 @@ export function buildTimeMachineExploreAnchorStrip(input: Readonly<{
   const firstTrack = topTracks[0];
   if (firstTrack) {
     pushUnique(
-      trackToStripItem(firstTrack, monthYyyMm),
+      trackToStripItem(firstTrack, monthYyyMm, archivePath),
       stripDedupeKey({
         imageUrl: firstTrack.lastfm_cover_image_url,
         albumId: firstTrack.album_id,
@@ -108,7 +112,7 @@ export function buildTimeMachineExploreAnchorStrip(input: Readonly<{
     const row = topTracks.find((t) => normArtist(t.artist_name) === topArtistNorm && t.track_id !== firstTrack?.track_id);
     if (row) {
       pushUnique(
-        trackToStripItem(row, monthYyyMm),
+        trackToStripItem(row, monthYyyMm, archivePath),
         stripDedupeKey({
           imageUrl: row.lastfm_cover_image_url,
           albumId: row.album_id,
@@ -121,7 +125,7 @@ export function buildTimeMachineExploreAnchorStrip(input: Readonly<{
   const firstAlbum = topAlbums[0];
   if (firstAlbum) {
     pushUnique(
-      albumToStripItem(firstAlbum, monthYyyMm),
+      albumToStripItem(firstAlbum, monthYyyMm, archivePath),
       stripDedupeKey({
         imageUrl: firstAlbum.lastfm_cover_image_url,
         albumId: firstAlbum.album_id,
@@ -136,7 +140,7 @@ export function buildTimeMachineExploreAnchorStrip(input: Readonly<{
     const row = topTracks.find((t) => normArtist(t.artist_name) === nk);
     if (row) {
       pushUnique(
-        trackToStripItem(row, monthYyyMm),
+        trackToStripItem(row, monthYyyMm, archivePath),
         stripDedupeKey({
           imageUrl: row.lastfm_cover_image_url,
           albumId: row.album_id,
@@ -149,7 +153,7 @@ export function buildTimeMachineExploreAnchorStrip(input: Readonly<{
   const secondAlbum = topAlbums[1];
   if (secondAlbum) {
     pushUnique(
-      albumToStripItem(secondAlbum, monthYyyMm),
+      albumToStripItem(secondAlbum, monthYyyMm, archivePath),
       stripDedupeKey({
         imageUrl: secondAlbum.lastfm_cover_image_url,
         albumId: secondAlbum.album_id,
@@ -163,7 +167,7 @@ export function buildTimeMachineExploreAnchorStrip(input: Readonly<{
       break;
     }
     pushUnique(
-      trackToStripItem(row, monthYyyMm),
+      trackToStripItem(row, monthYyyMm, archivePath),
       stripDedupeKey({
         imageUrl: row.lastfm_cover_image_url,
         albumId: row.album_id,
@@ -176,7 +180,7 @@ export function buildTimeMachineExploreAnchorStrip(input: Readonly<{
       break;
     }
     pushUnique(
-      albumToStripItem(row, monthYyyMm),
+      albumToStripItem(row, monthYyyMm, archivePath),
       stripDedupeKey({
         imageUrl: row.lastfm_cover_image_url,
         albumId: row.album_id,

@@ -55,10 +55,12 @@ export function DashboardTimeMachineScrubber({
   timeline,
   selectedMonth,
   timelineView,
+  explorePath = "/dashboard/explore",
 }: Readonly<{
   timeline: readonly TimeMachineMonthDensityRow[];
   selectedMonth: string;
   timelineView: TimeMachineTimelineView;
+  explorePath?: string;
 }>) {
   const router = useRouter();
   const newMusicTimeline = useMemo(
@@ -133,12 +135,12 @@ export function DashboardTimeMachineScrubber({
       if (timelineView === "new-music") {
         qs.set("view", "new-music");
       }
-      router.push(`/dashboard/explore?${qs.toString()}`, { scroll: false });
+      router.push(`${explorePath}?${qs.toString()}`, { scroll: false });
       window.setTimeout(() => {
         pendingNav.current = null;
       }, 400);
     },
-    [router, timelineView],
+    [router, timelineView, explorePath],
   );
 
   const toggleNewMusicView = useCallback(() => {
@@ -146,7 +148,7 @@ export function DashboardTimeMachineScrubber({
       return;
     }
     if (timelineView === "new-music") {
-      router.push(`/dashboard/explore?month=${encodeURIComponent(selectedMonth)}`, { scroll: false });
+      router.push(`${explorePath}?month=${encodeURIComponent(selectedMonth)}`, { scroll: false });
       return;
     }
     const inFiltered = newMusicTimeline.some((r) => r.period_start.slice(0, 7) === selectedMonth);
@@ -154,10 +156,10 @@ export function DashboardTimeMachineScrubber({
       ? selectedMonth
       : (newMusicTimeline[newMusicTimeline.length - 1]?.period_start.slice(0, 7) ?? selectedMonth);
     router.push(
-      `/dashboard/explore?month=${encodeURIComponent(targetMonth)}&view=${encodeURIComponent("new-music")}`,
+      `${explorePath}?month=${encodeURIComponent(targetMonth)}&view=${encodeURIComponent("new-music")}`,
       { scroll: false },
     );
-  }, [newMusicTimeline, router, selectedMonth, timelineView]);
+  }, [newMusicTimeline, router, selectedMonth, timelineView, explorePath]);
 
   const scheduleNavigateToIndex = useCallback(
     (idx: number) => {
